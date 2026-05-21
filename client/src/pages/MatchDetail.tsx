@@ -1,25 +1,25 @@
 import { useState } from "react";
-import { useRoute, useLocation } from "wouter";
+import { useRoute, useLocation, Link } from "wouter";
 const flagUrl = (code: string) => `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
 
-interface Player { name: string; number: number; position: string; club: string; age: number; caps: number; goals: number; img: string; }
+interface Player { slug: string; name: string; number: number; position: string; club: string; age: number; caps: number; goals: number; img: string; }
 interface TeamSquad { code: string; name: string; flagCode: string; coach: string; formation: string; players: Player[]; }
 
 const DB: Record<string, { home: TeamSquad; away: TeamSquad; date: string; time: string; venue: string; capacity: number; broadcast: { platform: string; region: string }[] }> = {
   "mex-vs-rsa": {
     home: { code: "MEX", name: "Mexico", flagCode: "mx", coach: "Javier Aguirre", formation: "4-3-3",
       players: [
-        { name: "Guillermo Ochoa", number: 13, position: "GK", club: "Salernitana", age: 40, caps: 148, goals: 0, img: "https://images.unsplash.com/photo-1508341591423-4347099e1f19?w=120&q=80" },
-        { name: "Edson Álvarez", number: 4, position: "MF", club: "West Ham", age: 28, caps: 78, goals: 5, img: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=120&q=80" },
-        { name: "Santiago Giménez", number: 9, position: "FW", club: "Feyenoord", age: 25, caps: 32, goals: 18, img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=120&q=80" },
+        { slug: "guillermo-ochoa", name: "Guillermo Ochoa", number: 13, position: "GK", club: "Salernitana", age: 40, caps: 148, goals: 0, img: "https://images.unsplash.com/photo-1508341591423-4347099e1f19?w=120&q=80" },
+        { slug: "edson-alvarez", name: "Edson Álvarez", number: 4, position: "MF", club: "West Ham", age: 28, caps: 78, goals: 5, img: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=120&q=80" },
+        { slug: "santiago-gimenez", name: "Santiago Giménez", number: 9, position: "FW", club: "Feyenoord", age: 25, caps: 32, goals: 18, img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=120&q=80" },
         { name: "Hirving Lozano", number: 22, position: "FW", club: "PSV", age: 30, caps: 70, goals: 17, img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=120&q=80" },
         { name: "César Montes", number: 3, position: "DF", club: "Almería", age: 28, caps: 46, goals: 1, img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&q=80" },
         { name: "Luis Chávez", number: 18, position: "MF", club: "Dynamo Moscow", age: 28, caps: 34, goals: 4, img: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=120&q=80" },
       ]},
     away: { code: "RSA", name: "South Africa", flagCode: "za", coach: "Hugo Broos", formation: "4-4-2",
       players: [
-        { name: "Ronwen Williams", number: 1, position: "GK", club: "Mamelodi Sundowns", age: 32, caps: 42, goals: 0, img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&q=80" },
-        { name: "Percy Tau", number: 10, position: "FW", club: "Al Ahly", age: 31, caps: 45, goals: 16, img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80" },
+        { slug: "ronwen-williams", name: "Ronwen Williams", number: 1, position: "GK", club: "Mamelodi Sundowns", age: 32, caps: 42, goals: 0, img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&q=80" },
+        { slug: "percy-tau", name: "Percy Tau", number: 10, position: "FW", club: "Al Ahly", age: 31, caps: 45, goals: 16, img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80" },
         { name: "Teboho Mokoena", number: 8, position: "MF", club: "Mamelodi Sundowns", age: 27, caps: 30, goals: 4, img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&q=80" },
         { name: "Sipho Mbule", number: 14, position: "MF", club: "Mamelodi Sundowns", age: 26, caps: 20, goals: 2, img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&q=80" },
         { name: "Grant Kekana", number: 5, position: "DF", club: "Mamelodi Sundowns", age: 32, caps: 18, goals: 0, img: "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=120&q=80" },
@@ -124,7 +124,8 @@ export default function MatchDetail() {
                 <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-muted)", width: 24, textAlign: "right" }}>{p.number}</span>
                 <img src={p.img} alt="" style={{ width: 34, height: 34, borderRadius: "50%", objectFit: "cover" }} onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                 <div style={{ flex: 1 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--accent-blue)", cursor: "pointer" }}>{p.name}</span>
+                  <Link href={`/players/${p.slug}`} style={{ fontSize: 13, fontWeight: 600, color: "var(--accent-blue)", textDecoration: "none", cursor: "pointer" }}
+                    onClick={e => e.stopPropagation()}>{p.name}</Link>
                   <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 6 }}>{p.position}</span>
                 </div>
               </div>
