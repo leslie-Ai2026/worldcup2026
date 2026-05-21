@@ -121,7 +121,7 @@ p { color: var(--text-secondary); line-height: 1.65; }
 @media (max-width: 767px) { .hide-mobile { display:none!important; } }
 @media (min-width: 768px) { .hide-desktop { display:none!important; } }
 
-/* ─── HOME PAGE MOBILE RESPONSIVE ─────────────────────── */
+/* ─── HOME MOBILE RESPONSIVE ──────────────────────────── */
 @media (max-width: 767px) {
   .home-two-col { flex-direction: column !important; }
   .home-left-col { padding-right: 0 !important; }
