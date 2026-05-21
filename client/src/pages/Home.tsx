@@ -35,10 +35,10 @@ const TEAMS = [
   { code: "es", name: "Spain" }, { code: "de", name: "Germany" }, { code: "pt", name: "Portugal" }, { code: "nl", name: "Netherlands" },
 ];
 const BOOT_PLAYERS = [
-  { id: "mbappe", name: "Mbappé", flagCode: "fr", club: "Real Madrid", img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=100&q=80" },
-  { id: "messi", name: "Messi", flagCode: "ar", club: "Inter Miami", img: "https://images.unsplash.com/photo-1508098682722-e99c643e7f0b?w=100&q=80" },
-  { id: "bellingham", name: "Bellingham", flagCode: "gb", club: "Real Madrid", img: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=100&q=80" },
-  { id: "vinicius", name: "Vinicius", flagCode: "br", club: "Real Madrid", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100&q=80" },
+  { id: "mbappe", slug: "kylian-mbappe", name: "Mbappé",  flagCode: "fr", club: "Real Madrid", img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=100&q=80" },
+  { id: "messi", slug: "lionel-messi", name: "Messi", flagCode: "ar", club: "Inter Miami", img: "https://images.unsplash.com/photo-1508098682722-e99c643e7f0b?w=100&q=80" },
+  { id: "bellingham", slug: "jude-bellingham", name: "Bellingham", flagCode: "gb", club: "Real Madrid", img: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=100&q=80" },
+  { id: "vinicius", slug: "vinicius-jr", name: "Vinicius", flagCode: "br", club: "Real Madrid", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100&q=80" },
 ];
 
 function getPct(data: any, choice: string): number {
@@ -65,7 +65,15 @@ export default function Home() {
   const addComment = trpc.comments.addComment.useMutation({ onSuccess: () => utils.comments.getComments.invalidate() });
   const [commentText, setCommentText] = useState("");
 
-  const handleChampVote = (choice: string) => { if (voterId) castVote.mutate({ category: "champion", choice, voterId }); };
+  const [localChampVote, setLocalChampVote] = useState<string | null>(() => { try { return localStorage.getItem("wc2026_champ_vote"); } catch { return null; } });
+
+  const handleChampVote = (choice: string) => {
+    if (voterId) {
+      castVote.mutate({ category: "champion", choice, voterId });
+      try { localStorage.setItem("wc2026_champ_vote", choice); } catch {}
+      setLocalChampVote(choice);
+    }
+  };
   const handleBootVote = (choice: string) => { if (voterId) castVote.mutate({ category: "best_player", choice, voterId }); };
 
   return (
@@ -73,7 +81,8 @@ export default function Home() {
       <div className="home-two-col" style={{ display: "flex", gap: 0, flexDirection: "row", flexWrap: "wrap" }}>
         {/* ═══ LEFT COLUMN ═══════════════════════════════════════ */}
         <div className="home-left-col" style={{ flex: "1 1 0", minWidth: 0, paddingRight: 12 }}>
-          {/* Hero Poster */}
+          {/* Hero Poster — clickable to match */}
+          <Link href={`/match/${MATCHES[0].id}`} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
           <div style={{ border: "1px solid var(--border)", overflow: "hidden", position: "relative", cursor: "pointer" }}>
             <img className="home-hero-img" src={NEWS[0].img} alt={NEWS[0].title} style={{ width: "100%", height: 400, objectFit: "cover", display: "block" }}
               onError={e => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=85"; }} />
@@ -83,11 +92,13 @@ export default function Home() {
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "rgba(255,255,255,0.5)" }}>⏱ {NEWS[0].time}</span>
             </div>
           </div>
+          </Link>
           {/* Trending News */}
           <div className="section-head" style={{ marginTop: 16 }}><div className="bar" /><span className="title">TRENDING NEWS</span><div className="rule" /></div>
           <div className="home-news-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }}>
             {NEWS.slice(1).map(story => (
-              <div key={story.id} className="card" style={{ cursor: "pointer", overflow: "hidden" }}>
+              <Link key={story.id} href={`/match/${MATCHES[0].id}`} style={{ textDecoration: "none", color: "inherit" }}>
+              <div className="card" style={{ cursor: "pointer", overflow: "hidden" }}>
                 <img src={story.img} alt={story.title} style={{ width: "100%", height: 100, objectFit: "cover", display: "block" }} onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                 <div style={{ padding: "10px 12px" }}>
                   <span className="tag" style={{ color: story.tagColor, background: "none", marginBottom: 4, display: "inline-block" }}>{story.tag}</span>
@@ -95,6 +106,7 @@ export default function Home() {
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-muted)" }}>{story.time}</span>
                 </div>
               </div>
+              </Link>
             ))}
           </div>
           {/* Upcoming Matches */}
@@ -161,8 +173,8 @@ export default function Home() {
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 12 }}>Tap a team to vote</div>
             {TEAMS.map(team => {
               const pct = getPct(champR.data, team.code);
-              const voted = myChamp.data?.choice === team.code;
-              const hasVoted = !!myChamp.data?.choice;
+              const voted = myChamp.data?.choice === team.code || localChampVote === team.code;
+              const hasVoted = !!myChamp.data?.choice || !!localChampVote;
               return (
                 <button key={team.code} onClick={() => !hasVoted && handleChampVote(team.code)} disabled={hasVoted}
                   style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 10px", marginBottom: 4, width: "100%", background: voted ? "#F9FAFB" : "#fff", border: voted ? "1px solid #111827" : "1px solid var(--border)", cursor: hasVoted ? "default" : "pointer", transition: "all 0.1s", textAlign: "left" }}>
@@ -186,8 +198,9 @@ export default function Home() {
               const voted = myBoot.data?.choice === p.id;
               const hasVoted = !!myBoot.data?.choice;
               return (
-                <button key={p.id} onClick={() => !hasVoted && handleBootVote(p.id)} disabled={hasVoted}
-                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", marginBottom: 6, width: "100%", background: voted ? "#F9FAFB" : "#fff", border: voted ? "1px solid #111827" : "1px solid var(--border)", cursor: hasVoted ? "default" : "pointer", transition: "all 0.1s", textAlign: "left" }}>
+                <div key={p.id} style={{ display: "flex", gap: 0, marginBottom: 6 }}>
+                <button onClick={() => !hasVoted && handleBootVote(p.id)} disabled={hasVoted}
+                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", flex: 1, background: voted ? "#F9FAFB" : "#fff", border: voted ? "1px solid #111827" : "1px solid var(--border)", cursor: hasVoted ? "default" : "pointer", transition: "all 0.1s", textAlign: "left" }}>
                   <img src={p.img} alt={p.name} style={{ width: 34, height: 34, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ fontFamily: "var(--font-body)", fontWeight: 600, fontSize: 13 }}>{p.name}</span>{idx === 0 && <span className="tag tag-new" style={{ fontSize: 7, padding: "1px 3px" }}>AI PICK</span>}</div>
@@ -195,6 +208,12 @@ export default function Home() {
                   </div>
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>{pct}%</span>
                 </button>
+                <Link href={`/players/${p.slug}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 36, border: "1px solid var(--border)", borderLeft: "none", cursor: "pointer", textDecoration: "none", color: "var(--text-muted)", fontSize: 14, transition: "background 0.1s" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#F9FAFB"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}>
+                  →
+                </Link>
+                </div>
               );
             })}
             <Link href="/ai-predictor" style={{ textDecoration: "none", display: "block", marginTop: 12 }}><button className="btn-black" style={{ width: "100%", justifyContent: "center", fontSize: 12, padding: "10px 0" }}>🤖 AI GOLDEN BOOT PREDICTION</button></Link>
