@@ -1,0 +1,130 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL DESIGN TOKENS — Strict White Editorial
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg-primary:    #FFFFFF;
+  --bg-secondary:  #F9FAFB;
+  --border:        #E5E7EB;
+  --text-primary:  #111827;
+  --text-secondary:#6B7280;
+  --text-muted:    #9CA3AF;
+  --accent-red:    #EF4444;
+  --accent-blue:   #2563EB;
+  --accent-gold:   #B8860B;
+  --gold-light:    #FEF3C7;
+  --green:         #16A34A;
+
+  --font-display:  "Barlow Condensed", "Inter", sans-serif;
+  --font-body:     "Inter", sans-serif;
+  --font-mono:     "JetBrains Mono", monospace;
+
+  --radius-sm: 2px;
+  --radius:    4px;
+  --shadow-none: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESET
+   ═══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 2px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════════ */
+h1, h2, h3 { font-family: var(--font-display); font-weight: 800; color: var(--text-primary); line-height: 1.1; letter-spacing: -0.01em; }
+p { color: var(--text-secondary); line-height: 1.65; }
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATIONS — breath only, zero glow, zero scale
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes breathPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@keyframes tickerScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.live-dot { width:8px; height:8px; border-radius:50%; background:var(--accent-red); display:inline-block; animation:breathPulse 2s ease-in-out infinite; flex-shrink:0; }
+
+/* ═══════════════════════════════════════════════════════════════
+   CARDS — 1px solid #E5E7EB, zero shadow, zero radius by default
+   ═══════════════════════════════════════════════════════════════ */
+.card { background:#fff; border:1px solid var(--border); transition: border-color 0.12s; }
+.card:hover { border-color:#D1D5DB; }
+
+/* ═══════════════════════════════════════════════════════════════
+   BUTTONS
+   ═══════════════════════════════════════════════════════════════ */
+.btn-black {
+  font-family: var(--font-body); font-weight: 600; font-size: 13px;
+  color: #fff; background: #111827; border: none; border-radius: var(--radius);
+  padding: 10px 22px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-black:hover { background: #1F2937; }
+
+.btn-outline {
+  font-family: var(--font-body); font-weight: 600; font-size: 13px;
+  color: var(--text-primary); background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 22px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-outline:hover { background: var(--bg-secondary); border-color: #D1D5DB; }
+
+.btn-gold {
+  font-family: var(--font-body); font-weight: 600; font-size: 13px;
+  color: #fff; background: var(--accent-gold); border: none; border-radius: var(--radius);
+  padding: 10px 22px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-gold:hover { background: #9A7209; }
+
+/* ═══════════════════════════════════════════════════════════════
+   TAGS
+   ═══════════════════════════════════════════════════════════════ */
+.tag {
+  font-family: var(--font-body); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 2px 6px; border-radius: 2px; display: inline-block;
+}
+.tag-live { background:#FEE2E2; color:var(--accent-red); border:1px solid #FECACA; }
+.tag-new { background:var(--gold-light); color:var(--accent-gold); border:1px solid #FDE68A; }
+.tag-green { background:#DCFCE7; color:var(--green); border:1px solid #BBF7D0; }
+
+/* ═══════════════════════════════════════════════════════════════
+   PROGRESS BAR
+   ═══════════════════════════════════════════════════════════════ */
+.progress-track { height:4px; background:#E5E7EB; border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--accent-gold); border-radius:2px; transition:width 0.4s ease; }
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION HEADER — gold accent bar
+   ═══════════════════════════════════════════════════════════════ */
+.section-head { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.section-head .bar { width:3px; height:18px; background:var(--accent-gold); border-radius:1px; flex-shrink:0; }
+.section-head .title { font-family:var(--font-display); font-weight:700; font-size:17px; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.02em; }
+.section-head .rule { flex:1; height:1px; background:var(--border); }
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) { .hide-mobile { display:none!important; } }
+@media (min-width: 768px) { .hide-desktop { display:none!important; } }
+
+/* ═══════════════════════════════════════════════════════════════
+   TAILWIND
+   ═══════════════════════════════════════════════════════════════ */
+@layer base {
+  * { border-color: var(--border); }
+  body { background-color: var(--bg-primary); color: var(--text-primary); }
+}
