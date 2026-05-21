@@ -2,6 +2,34 @@ import { useRoute, Link } from "wouter";
 
 const flagUrl = (code: string) => `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
 
+// ─── Country-Based Merch Catalog ─────────────────────────────────
+const COUNTRY_MERCH: Record<string, { name: string; price: string; img: string }[]> = {
+  mx: [
+    { name: "El Tri Vintage Supporter Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "Mexico Green Fan Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
+    { name: "Estadio Azteca Print Hoodie", price: "$45.00", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=85" },
+  ],
+  fr: [
+    { name: "Les Bleus #10 Jersey Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "French Blue Supporter Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
+    { name: "Paris Victory Hoodie", price: "$45.00", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=85" },
+  ],
+  za: [
+    { name: "Bafana Bafana Supporter Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "South Africa Fan Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
+    { name: "Rainbow Nation Hoodie", price: "$45.00", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=85" },
+  ],
+  default: [
+    { name: "World Cup 2026 Supporter Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "Classic Fan Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
+    { name: "Stadium Ready Hoodie", price: "$45.00", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=85" },
+  ],
+};
+
+function getMerchForCountry(flagCode: string): { name: string; price: string; img: string }[] {
+  return COUNTRY_MERCH[flagCode] || COUNTRY_MERCH.default;
+}
+
 // ─── Player Datasets ────────────────────────────────────────────
 interface PlayerData {
   slug: string; name: string; number: number; position: string; club: string;
@@ -11,7 +39,6 @@ interface PlayerData {
   upcomingMatch: { opponent: string; date: string; venue: string; broadcast: string[] };
   stats: { label: string; value: string }[];
   aiTactical: { strengths: string[]; weaknesses: string[]; longTailKeywords: string[]; predictedImpact: string; };
-  merch: { name: string; price: string; img: string }[];
 }
 
 const PLAYER_DB: Record<string, PlayerData> = {
@@ -44,11 +71,6 @@ const PLAYER_DB: Record<string, PlayerData> = {
       ],
       predictedImpact: "Mbappé is projected to generate 0.82 xG per 90 minutes, the highest of any forward at the 2026 World Cup. France's tactical system is built around his pace on the left channel and his ability to cut inside onto his right foot. Expect him to be the target of 45% of France's attacking sequences. AI models predict a 28% probability of winning the Golden Boot.",
     },
-    merch: [
-      { name: "Mbappé #10 France Jersey Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
-      { name: "French Blue Supporter Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
-      { name: "Les Bleus Victory Hoodie", price: "$45.00", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=85" },
-    ],
   },
   "guillermo-ochoa": {
     slug: "guillermo-ochoa", name: "Guillermo Ochoa", number: 13, position: "Goalkeeper",
@@ -252,8 +274,8 @@ export default function PlayerProfile() {
               <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 14, color: "#fff", letterSpacing: "0.03em" }}>👕 {player.name.split(" ").pop()} SUPPORTER KIT</span>
             </div>
             <div style={{ padding: "12px" }}>
-              {player.merch.map((item, idx) => (
-                <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: idx < player.merch.length - 1 ? "1px solid var(--border)" : "none" }}>
+              {getMerchForCountry(player.flagCode).map((item, idx) => (
+                <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: idx < getMerchForCountry(player.flagCode).length - 1 ? "1px solid var(--border)" : "none" }}>
                   <img src={item.img} alt={item.name} style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 2, flexShrink: 0, border: "1px solid var(--border)" }}
                     onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                   <div style={{ flex: 1 }}>
