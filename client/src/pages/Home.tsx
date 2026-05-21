@@ -97,7 +97,7 @@ export default function Home() {
           <div className="section-head" style={{ marginTop: 16 }}><div className="bar" /><span className="title">TRENDING NEWS</span><div className="rule" /></div>
           <div className="home-news-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }}>
             {NEWS.slice(1).map(story => (
-              <Link key={story.id} href={`/match/${MATCHES[0].id}`} style={{ textDecoration: "none", color: "inherit" }}>
+              <Link key={story.id} href={`/news/${story.id}`} style={{ textDecoration: "none", color: "inherit" }}>
               <div className="card" style={{ cursor: "pointer", overflow: "hidden" }}>
                 <img src={story.img} alt={story.title} style={{ width: "100%", height: 100, objectFit: "cover", display: "block" }} onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                 <div style={{ padding: "10px 12px" }}>

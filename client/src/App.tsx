@@ -19,6 +19,7 @@ import Privacy from "./pages/Privacy";
 import AIPredictor from "./pages/AIPredictor";
 import SupporterKit from "./pages/SupporterKit";
 import PlayerProfile from "./pages/PlayerProfile";
+import NewsArticle from "./pages/NewsArticle";
 
 function Router() {
   return (
@@ -28,6 +29,7 @@ function Router() {
         <Route path="/matches"         component={Matches} />
         <Route path="/match/:matchId"  component={MatchDetail} />
         <Route path="/players/:slug" component={PlayerProfile} />
+        <Route path="/news/:id"      component={NewsArticle} />
         <Route path="/ai-predictor"    component={AIPredictor} />
         <Route path="/golden-boot"     component={GoldenBoot} />
         <Route path="/host-city-guide" component={HostCityGuide} />
