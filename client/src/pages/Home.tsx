@@ -71,7 +71,7 @@ export default function Home() {
   return (
     <div style={{ maxWidth: 1440, margin: "0 auto", padding: "16px 16px 40px", background: "#fff" }}>
 
-      <div style={{ display: "flex", gap: 0 }}>
+      <div style={{ display: "flex", gap: 0, flexDirection: "row", flexWrap: "wrap" }}>
 
         {/* ─── LEFT COLUMN ────────────────────────────────── */}
         <div style={{ flex: "1 1 0", minWidth: 0, paddingRight: 12 }}>
@@ -79,7 +79,7 @@ export default function Home() {
           {/* ── HERO POSTER — 400px cinematic, title overlay ── */}
           <div style={{ border: "1px solid var(--border)", overflow: "hidden", position: "relative", cursor: "pointer" }}>
             <img src={NEWS[0].img} alt={NEWS[0].title}
-              style={{ width: "100%", height: 400, objectFit: "cover", display: "block" }}
+              className="home-hero-img" style={{ width: "100%", height: 400, objectFit: "cover", display: "block" }}
               onError={e => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=85"; }} />
             <div style={{
               position: "absolute", bottom: 0, left: 0, right: 0,
@@ -97,7 +97,7 @@ export default function Home() {
             <div className="bar" /><span className="title">TRENDING NEWS</span><div className="rule" />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }} className="home-news-grid">
             {NEWS.slice(1).map(story => (
               <div key={story.id} className="card" style={{ cursor: "pointer", overflow: "hidden" }}>
                 <img src={story.img} alt={story.title}
@@ -169,7 +169,7 @@ export default function Home() {
         </div>
 
         {/* ─── RIGHT SIDEBAR ───────────────────────────────── */}
-        <div style={{ width: 380, flexShrink: 0, background: "var(--bg-secondary)", padding: "16px 16px", display: "flex", flexDirection: "column", gap: 16 }}>
+        <div className="home-right-col" style={{ width: 380, flexShrink: 0, background: "var(--bg-secondary)", padding: "16px 16px", display: "flex", flexDirection: "column", gap: 16 }}>
 
           <div className="card" style={{ padding: 18, background: "#fff" }}>
             <div style={{ fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 8 }}>COUNTDOWN</div>
@@ -238,5 +238,26 @@ export default function Home() {
         </div>
       </div>
     </div>
+    <style>{`
+      @media (max-width: 767px) {
+        .home-two-col {
+          flex-direction: column !important;
+        }
+        .home-left-col {
+          padding-right: 0 !important;
+        }
+        .home-right-col {
+          width: 100% !important;
+          margin-top: 20px;
+        }
+        .home-hero-img {
+          height: 220px !important;
+        }
+        .home-news-grid {
+          grid-template-columns: 1fr 1fr !important;
+        }
+      }
+    `}</style>
+    </>
   );
 }
