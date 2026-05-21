@@ -12,9 +12,10 @@ const DB: Record<string, { home: TeamSquad; away: TeamSquad; date: string; time:
         { slug: "guillermo-ochoa", name: "Guillermo Ochoa", number: 13, position: "GK", club: "Salernitana", age: 40, caps: 148, goals: 0, img: "https://images.unsplash.com/photo-1508341591423-4347099e1f19?w=120&q=80" },
         { slug: "edson-alvarez", name: "Edson Álvarez", number: 4, position: "MF", club: "West Ham", age: 28, caps: 78, goals: 5, img: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=120&q=80" },
         { slug: "santiago-gimenez", name: "Santiago Giménez", number: 9, position: "FW", club: "Feyenoord", age: 25, caps: 32, goals: 18, img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=120&q=80" },
-        { name: "Hirving Lozano", number: 22, position: "FW", club: "PSV", age: 30, caps: 70, goals: 17, img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=120&q=80" },
-        { name: "César Montes", number: 3, position: "DF", club: "Almería", age: 28, caps: 46, goals: 1, img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&q=80" },
-        { name: "Luis Chávez", number: 18, position: "MF", club: "Dynamo Moscow", age: 28, caps: 34, goals: 4, img: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=120&q=80" },
+        { slug: "kylian-mbappe", name: "Kylian Mbappé", number: 10, position: "FW", club: "Real Madrid", age: 27, caps: 92, goals: 56, img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=120&q=80" },
+        { slug: "hirving-lozano", name: "Hirving Lozano", number: 22, position: "FW", club: "PSV", age: 30, caps: 70, goals: 17, img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=120&q=80" },
+        { slug: "cesar-montes", name: "César Montes", number: 3, position: "DF", club: "Almería", age: 28, caps: 46, goals: 1, img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&q=80" },
+        { slug: "luis-chavez", name: "Luis Chávez", number: 18, position: "MF", club: "Dynamo Moscow", age: 28, caps: 34, goals: 4, img: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=120&q=80" },
       ]},
     away: { code: "RSA", name: "South Africa", flagCode: "za", coach: "Hugo Broos", formation: "4-4-2",
       players: [

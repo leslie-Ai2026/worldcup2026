@@ -1,83 +1,104 @@
 import { useRoute, Link } from "wouter";
-import { useState } from "react";
 
 const flagUrl = (code: string) => `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
 
-// ─── Player Database ───────────────────────────────────────────
+// ─── Player Datasets ────────────────────────────────────────────
 interface PlayerData {
   slug: string; name: string; number: number; position: string; club: string;
   age: number; caps: number; goals: number; flagCode: string; country: string;
   height: string; preferredFoot: string; marketValue: string;
-  img: string; actionImg: string;
-  bio: string;
+  img: string; actionImg: string; bio: string;
   upcomingMatch: { opponent: string; date: string; venue: string; broadcast: string[] };
-  aiAnalysis: { strengths: string[]; weaknesses: string[]; predictedImpact: string; };
+  stats: { label: string; value: string }[];
+  aiTactical: { strengths: string[]; weaknesses: string[]; longTailKeywords: string[]; predictedImpact: string; };
+  merch: { name: string; price: string; img: string }[];
 }
 
 const PLAYER_DB: Record<string, PlayerData> = {
+  "kylian-mbappe": {
+    slug: "kylian-mbappe", name: "Kylian Mbappé", number: 10, position: "Forward",
+    club: "Real Madrid", age: 27, caps: 92, goals: 56, flagCode: "fr", country: "France",
+    height: "1.78m", preferredFoot: "Right", marketValue: "€180M",
+    img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&q=85",
+    actionImg: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=1200&q=85",
+    bio: "Kylian Mbappé is the most electrifying forward in world football. The France captain and Real Madrid superstar arrives at the 2026 World Cup at his physical peak. After a record-breaking La Liga season, he is the undisputed favourite to claim both the Golden Boot and lead France to back-to-back World Cup titles.",
+    upcomingMatch: {
+      opponent: "Germany", date: "June 13, 2026 · 21:00", venue: "MetLife Stadium, New York",
+      broadcast: ["FOX Sports (United States)", "BBC One (United Kingdom)", "TF1 (France)", "TSN (Canada)", "ZDF (Germany)"],
+    },
+    stats: [
+      { label: "Goals/90", value: "0.82" }, { label: "xG/90", value: "0.74" },
+      { label: "Shot Accuracy", value: "62%" }, { label: "Dribbles/90", value: "4.1" },
+      { label: "Key Passes/90", value: "2.3" }, { label: "Match Rating", value: "8.4" },
+    ],
+    aiTactical: {
+      strengths: ["World-class acceleration over first 5 meters", "Clinical finishing from both feet inside the box", "Intelligent off-ball movement that stretches defensive lines", "Penalty box composure — 91% career conversion rate"],
+      weaknesses: ["Can drift wide and become isolated in low-block systems", "Defensive pressing intensity drops late in matches", "Occasional frustration against physical double-marking"],
+      longTailKeywords: [
+        "Mbappé 2026 World Cup goals prediction",
+        "Kylian Mbappé Golden Boot odds 2026",
+        "Mbappé France World Cup captain tactics",
+        "Mbappé vs Haaland 2026 World Cup comparison",
+        "Mbappé Real Madrid World Cup form 2026",
+        "Kylian Mbappé World Cup knockout stage record",
+      ],
+      predictedImpact: "Mbappé is projected to generate 0.82 xG per 90 minutes, the highest of any forward at the 2026 World Cup. France's tactical system is built around his pace on the left channel and his ability to cut inside onto his right foot. Expect him to be the target of 45% of France's attacking sequences. AI models predict a 28% probability of winning the Golden Boot.",
+    },
+    merch: [
+      { name: "Mbappé #10 France Jersey Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+      { name: "French Blue Supporter Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
+      { name: "Les Bleus Victory Hoodie", price: "$45.00", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=85" },
+    ],
+  },
   "guillermo-ochoa": {
     slug: "guillermo-ochoa", name: "Guillermo Ochoa", number: 13, position: "Goalkeeper",
     club: "Salernitana", age: 40, caps: 148, goals: 0, flagCode: "mx", country: "Mexico",
     height: "1.85m", preferredFoot: "Right", marketValue: "€800K",
-    img: "https://images.unsplash.com/photo-1508341591423-4347099e1f19?w=300&q=80",
-    actionImg: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&q=80",
+    img: "https://images.unsplash.com/photo-1508341591423-4347099e1f19?w=400&q=85",
+    actionImg: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=1200&q=85",
     bio: "Guillermo Ochoa is Mexico's legendary goalkeeper, famous for his World Cup heroics. Known as 'Memo', he's made more saves than any active CONCACAF goalkeeper in World Cup history and remains El Tri's undisputed #1 heading into 2026.",
     upcomingMatch: { opponent: "South Africa", date: "June 11, 2026 · 20:00", venue: "Estadio Azteca, Mexico City", broadcast: ["FOX Sports (US)", "Televisa (MX)", "BBC One (UK)", "TSN (CA)"] },
-    aiAnalysis: { strengths: ["Elite shot-stopping reflexes", "World Cup big-match experience", "Command of the penalty area on crosses"], weaknesses: ["Declining foot speed at age 40", "Distribution accuracy under pressure"], predictedImpact: "Ochoa remains the emotional leader of El Tri. Expect 4-5 critical saves per match. His World Cup experience is irreplaceable, but quick counter-attacks may expose his reduced mobility. Projected clean sheets: 1-2 in the group stage." },
-  },
-  "edson-alvarez": {
-    slug: "edson-alvarez", name: "Edson Álvarez", number: 4, position: "Midfielder",
-    club: "West Ham United", age: 28, caps: 78, goals: 5, flagCode: "mx", country: "Mexico",
-    height: "1.87m", preferredFoot: "Right", marketValue: "€35M",
-    img: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=300&q=80",
-    actionImg: "https://images.unsplash.com/photo-1551958219-acbc595d816f?w=800&q=80",
-    bio: "Edson Álvarez is the midfield anchor for both West Ham United and the Mexican national team. A product of Club América's academy, he has developed into one of the most reliable defensive midfielders in the Premier League. His ball-winning ability and progressive passing make him indispensable to Mexico's 4-3-3 system.",
-    upcomingMatch: { opponent: "South Africa", date: "June 11, 2026 · 20:00", venue: "Estadio Azteca, Mexico City", broadcast: ["FOX Sports (US)", "Televisa (MX)", "BBC One (UK)", "TSN (CA)"] },
-    aiAnalysis: { strengths: ["Premier League-proven ball recovery", "Progressive line-breaking passes", "Aerial dominance in midfield duels"], weaknesses: ["Pace against quick transitional counters", "Discipline risk on yellow card accumulation"], predictedImpact: "Álvarez will be the key to Mexico's midfield control. His ability to break up opposition attacks and quickly transition to offense sets the tempo. Projected to average 4.2 tackles and 88% pass completion per match." },
+    stats: [{ label: "Save %", value: "76%" }, { label: "Clean Sheets", value: "58" }, { label: "Saves/90", value: "3.8" }, { label: "Pen Saved", value: "4" }, { label: "Match Rating", value: "7.2" }],
+    aiTactical: { strengths: ["Elite shot-stopping reflexes", "World Cup big-match experience"], weaknesses: ["Declining foot speed at age 40"], longTailKeywords: ["Ochoa World Cup 2026 saves", "Mexico goalkeeper Ochoa World Cup"], predictedImpact: "Ochoa remains the emotional leader of El Tri. Projected clean sheets: 1-2 in group stage." },
+    merch: [{ name: "Ochoa #13 Mexico Jersey", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" }, { name: "El Tri Supporter Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" }],
   },
   "santiago-gimenez": {
     slug: "santiago-gimenez", name: "Santiago Giménez", number: 9, position: "Forward",
     club: "Feyenoord", age: 25, caps: 32, goals: 18, flagCode: "mx", country: "Mexico",
     height: "1.82m", preferredFoot: "Left", marketValue: "€50M",
-    img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=300&q=80",
-    actionImg: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80",
-    bio: "Santiago Giménez is Mexico's most prolific striker, dominating the Eredivisie with Feyenoord. The son of former Argentine footballer Christian Giménez, 'Bebote' combines lethal finishing with intelligent off-the-ball movement. He averaged 0.8 goals per 90 minutes in the 2025-26 season.",
-    upcomingMatch: { opponent: "South Africa", date: "June 11, 2026 · 20:00", venue: "Estadio Azteca, Mexico City", broadcast: ["FOX Sports (US)", "Televisa (MX)", "BBC One (UK)", "TSN (CA)"] },
-    aiAnalysis: { strengths: ["Clinical finishing inside the box", "Off-the-ball movement to create space", "Strong aerial presence for a striker"], weaknesses: ["Limited involvement in build-up play", "Can be isolated against deep defensive blocks"], predictedImpact: "Giménez is Mexico's primary goal threat. His goal conversion rate of 24% ranks in the 95th percentile among CONCACAF strikers. Expect him to be the target of 40% of Mexico's attacking sequences. Predicted: 4 goals in the group stage." },
-  },
-  "ronwen-williams": {
-    slug: "ronwen-williams", name: "Ronwen Williams", number: 1, position: "Goalkeeper",
-    club: "Mamelodi Sundowns", age: 32, caps: 42, goals: 0, flagCode: "za", country: "South Africa",
-    height: "1.84m", preferredFoot: "Right", marketValue: "€2.5M",
-    img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&q=80",
-    actionImg: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80",
-    bio: "Ronwen Williams is South Africa's captain and first-choice goalkeeper. Playing for dominant South African club Mamelodi Sundowns, he brings composure, leadership, and excellent distribution skills. He was instrumental in Bafana Bafana's qualification campaign.",
-    upcomingMatch: { opponent: "Mexico", date: "June 11, 2026 · 20:00", venue: "Estadio Azteca, Mexico City", broadcast: ["SuperSport (ZA)", "FOX Sports (US)", "BBC One (UK)", "Televisa (MX)"] },
-    aiAnalysis: { strengths: ["Commanding presence in the box", "Quick reflex saves from close range", "Leadership and defensive organization"], weaknesses: ["Limited experience against elite international forwards", "Height disadvantage on long-range efforts"], predictedImpact: "Williams faces a baptism of fire against Mexico at the Azteca. His shot-stopping will be tested by Mexico's dynamic front three. Expected to face 15+ shots. If he performs, South Africa could steal a point." },
+    img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&q=85",
+    actionImg: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=85",
+    bio: "Santiago Giménez is Mexico's most prolific striker, dominating the Eredivisie with Feyenoord. He averaged 0.8 goals per 90 minutes in the 2025-26 season.",
+    upcomingMatch: { opponent: "South Africa", date: "June 11, 2026 · 20:00", venue: "Estadio Azteca, Mexico City", broadcast: ["FOX Sports (US)", "Televisa (MX)", "BBC One (UK)"] },
+    stats: [{ label: "Goals/90", value: "0.71" }, { label: "xG/90", value: "0.58" }, { label: "Shot Acc", value: "54%" }, { label: "Conv Rate", value: "24%" }, { label: "Match Rating", value: "7.6" }],
+    aiTactical: { strengths: ["Clinical finishing inside the box", "Off-the-ball movement"], weaknesses: ["Limited build-up involvement"], longTailKeywords: ["Gimenez Mexico striker 2026", "Santiago Gimenez World Cup goals"], predictedImpact: "Mexico's primary goal threat. Predicted: 4 goals in group stage." },
+    merch: [{ name: "Giménez #9 Mexico Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" }, { name: "Mexico Fan Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" }],
   },
   "percy-tau": {
     slug: "percy-tau", name: "Percy Tau", number: 10, position: "Forward",
     club: "Al Ahly", age: 31, caps: 45, goals: 16, flagCode: "za", country: "South Africa",
     height: "1.75m", preferredFoot: "Right", marketValue: "€3M",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80",
-    actionImg: "https://images.unsplash.com/photo-1508098682722-e99c643e7f0b?w=800&q=80",
-    bio: "Percy Tau is South Africa's creative talisman and all-time leading active goalscorer. The 'Lion of Judah' made history as the first South African to play in the English Premier League (Brighton). Now at Egyptian giants Al Ahly, he remains Bafana Bafana's most dangerous attacking weapon.",
-    upcomingMatch: { opponent: "Mexico", date: "June 11, 2026 · 20:00", venue: "Estadio Azteca, Mexico City", broadcast: ["SuperSport (ZA)", "FOX Sports (US)", "BBC One (UK)", "Televisa (MX)"] },
-    aiAnalysis: { strengths: ["Dribbling in tight spaces", "Creative through-ball delivery", "Set-piece threat from direct free kicks"], weaknesses: ["Physicality against larger defenders", "Inconsistent finishing from distance"], predictedImpact: "Tau is South Africa's primary creative outlet. He will likely operate in the half-space behind the striker, looking to exploit Mexico's high defensive line. His link-up play with Makgopa is South Africa's best route to goal." },
+    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=85",
+    actionImg: "https://images.unsplash.com/photo-1508098682722-e99c643e7f0b?w=1200&q=85",
+    bio: "Percy Tau is South Africa's creative talisman and all-time leading active goalscorer. The 'Lion of Judah' made history as the first South African in the Premier League (Brighton).",
+    upcomingMatch: { opponent: "Mexico", date: "June 11, 2026 · 20:00", venue: "Estadio Azteca, Mexico City", broadcast: ["SuperSport (ZA)", "FOX Sports (US)", "BBC One (UK)"] },
+    stats: [{ label: "Goals/90", value: "0.41" }, { label: "Assists/90", value: "0.28" }, { label: "Dribbles/90", value: "3.2" }, { label: "Key Pass/90", value: "2.1" }, { label: "Match Rating", value: "7.1" }],
+    aiTactical: { strengths: ["Dribbling in tight spaces", "Creative through-ball delivery"], weaknesses: ["Physicality against larger defenders"], longTailKeywords: ["Percy Tau South Africa 2026", "Bafana Bafana Tau World Cup"], predictedImpact: "SA's primary creative outlet. His link-up with Makgopa is their best route to goal." },
+    merch: [{ name: "Tau #10 SA Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" }, { name: "Bafana Fan Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" }],
   },
 };
 
-// ─── Component ────────────────────────────────────────────────
+// ─── Page Component ────────────────────────────────────────────
 export default function PlayerProfile() {
   const [, params] = useRoute("/players/:slug");
-  const slug = params?.slug || "guillermo-ochoa";
+  const slug = params?.slug || "kylian-mbappe";
   const player = PLAYER_DB[slug];
 
   if (!player) {
     return (
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "60px 20px", textAlign: "center", background: "#fff" }}>
+      <div style={{ maxWidth: 960, margin: "60px auto", padding: "20px", textAlign: "center", background: "#fff" }}>
         <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 28, marginBottom: 8 }}>Player Not Found</h1>
-        <p style={{ fontSize: 14, color: "var(--text-secondary)", marginBottom: 20 }}>This player profile is not yet in our database.</p>
+        <p style={{ fontSize: 14, color: "var(--text-secondary)", marginBottom: 20 }}>This player profile hasn't been indexed yet. Check back soon.</p>
         <Link href="/matches" style={{ fontSize: 13, color: "var(--accent-blue)", textDecoration: "none" }}>← Back to Match Schedule</Link>
       </div>
     );
@@ -85,166 +106,182 @@ export default function PlayerProfile() {
 
   const canonicalUrl = `https://worldcuphacks.com/players/${player.slug}`;
   const pageTitle = `${player.name} — 2026 World Cup Player Profile, Stats & AI Analysis | WorldCupHacks`;
-  const pageDesc = `${player.name} (${player.club}, ${player.country}) — ${player.age} years old, ${player.caps} caps, ${player.goals} goals. AI tactical breakdown, match broadcast info, and Supporter Kit gear.`;
 
   return (
-    <div style={{ maxWidth: 960, margin: "0 auto", padding: "24px 20px 40px", background: "#fff" }}>
-      {/* pSEO meta (injected via JS for crawlers; use react-helmet in production) */}
-      <div style={{ display: "none" }} data-seo="true">
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px 40px", background: "#fff" }}>
+      {/* pSEO */}
+      <div style={{ display: "none" }}>
         <title>{pageTitle}</title>
-        <meta name="description" content={pageDesc} />
+        <meta name="description" content={`${player.name} (${player.club}, ${player.country}) — ${player.age} years old, ${player.caps} caps, ${player.goals} goals. AI tactical breakdown, live match broadcast, supporter kit.`} />
         <link rel="canonical" href={canonicalUrl} />
         <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDesc} />
         <meta property="og:image" content={player.img} />
-        <meta property="og:url" content={canonicalUrl} />
-        <meta name="twitter:card" content="summary_large_image" />
+        <script type="application/ld+json">{`{"@context":"https://schema.org","@type":"Person","name":"${player.name}","jobTitle":"Professional Football Player","affiliation":{"@type":"SportsTeam","name":"${player.country} National Team"}}`}</script>
       </div>
 
       {/* Breadcrumb */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 20, fontSize: 11, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-        <Link href="/" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Home</Link>
-        <span>/</span>
-        <Link href="/matches" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Matches</Link>
-        <span>/</span>
+      <div style={{ display: "flex", gap: 6, padding: "16px 0", fontSize: 11, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
+        <Link href="/" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Home</Link><span>/</span>
+        <Link href="/matches" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Matches</Link><span>/</span>
         <span style={{ color: "var(--text-primary)" }}>{player.name}</span>
       </div>
 
-      {/* ── HERO HEADER ───────────────────────────────────── */}
-      <div style={{ display: "flex", gap: 24, marginBottom: 28, flexWrap: "wrap" }}>
-        <img src={player.img} alt={player.name}
-          style={{ width: 160, height: 160, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "4px solid var(--border)" }}
-          onError={e => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=300&q=80"; }} />
-        <div style={{ flex: 1, minWidth: 260 }}>
-          <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "clamp(28px, 4vw, 40px)", marginBottom: 2 }}>{player.name}</h1>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
-            <img src={flagUrl(player.flagCode)} alt={player.country} style={{ width: 24, height: 16, objectFit: "contain" }} />
-            <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>{player.country}</span>
-            <span style={{ color: "var(--text-muted)" }}>·</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)" }}>#{player.number}</span>
-            <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>{player.position}</span>
-            <span style={{ color: "var(--text-muted)" }}>·</span>
-            <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>{player.club}</span>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: 10, marginBottom: 14 }}>
-            {[
-              { v: player.age, l: "Age" }, { v: player.caps, l: "Caps" },
-              { v: player.goals, l: "Int'l Goals" }, { v: player.marketValue, l: "Market Value" },
-            ].map(({ v, l }) => (
-              <div key={l} style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 2, padding: "8px 10px", textAlign: "center" }}>
-                <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 20, color: "var(--text-primary)", lineHeight: 1 }}>{typeof v === "string" ? v : v}</div>
-                <div style={{ fontSize: 9, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{l}</div>
+      {/* ═══ HERO BANNER — full-width action photo ═══════════════ */}
+      <div style={{ position: "relative", height: 340, overflow: "hidden", border: "1px solid var(--border)", marginBottom: 28 }}>
+        <img src={player.actionImg} alt={player.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          onError={e => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=1200&q=85"; }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.1) 100%)" }} />
+        {/* Hero overlay content */}
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "28px 28px 24px", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 20, flexWrap: "wrap" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+              <img src={player.img} alt="" style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", border: "3px solid #fff", flexShrink: 0 }}
+                onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+              <div>
+                <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "clamp(28px, 4vw, 42px)", color: "#fff", lineHeight: 1.05, marginBottom: 2 }}>{player.name}</h1>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                  <img src={flagUrl(player.flagCode)} alt="" style={{ width: 20, height: 14, objectFit: "contain" }} />
+                  <span style={{ fontSize: 13, color: "rgba(255,255,255,0.8)" }}>{player.country} · #{player.number} · {player.position}</span>
+                  <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>· {player.club}</span>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
-          <div style={{ fontSize: 12, color: "var(--text-secondary)", display: "flex", gap: 16 }}>
-            <span>📏 {player.height}</span>
-            <span>🦶 {player.preferredFoot}</span>
+          <div style={{ background: "rgba(0,0,0,0.5)", borderRadius: 2, padding: "10px 14px", textAlign: "center", flexShrink: 0 }}>
+            <div style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 28, color: "var(--gold-primary)", lineHeight: 1 }}>{player.marketValue}</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Market Value</div>
           </div>
         </div>
       </div>
 
-      {/* ── BIO ───────────────────────────────────────────── */}
-      <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: 28, fontStyle: "italic" }}>{player.bio}</p>
+      {/* ═══ 2-COLUMN LAYOUT ══════════════════════════════════════ */}
+      <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+        {/* ── LEFT (60%) ──────────────────────────────────────── */}
+        <div style={{ flex: "1 1 600px", minWidth: 0 }}>
 
-      {/* ═══ THREE COLUMN GRID ═══════════════════════════════ */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 32 }}>
+          {/* ── BIO ────────────────────────────────────────── */}
+          <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7, fontStyle: "italic", marginBottom: 24 }}>{player.bio}</p>
 
-        {/* ── BLOCK 1: LIVE MATCH BROADCAST ──────────────── */}
-        <div style={{ border: "1px solid var(--border)", background: "#fff" }}>
-          <div style={{ background: "#FEF2F2", borderBottom: "1px solid #FECACA", padding: "10px 14px", display: "flex", alignItems: "center", gap: 6 }}>
-            <span className="live-dot" />
-            <span style={{ fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 10, color: "var(--accent-red)", letterSpacing: "0.08em", textTransform: "uppercase" }}>LIVE MATCH BROADCAST</span>
-          </div>
-          <div style={{ padding: 14 }}>
-            <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 14, marginBottom: 2 }}>
-              {player.country} vs {player.upcomingMatch.opponent}
+          {/* ── LIVE BROADCAST ─────────────────────────────── */}
+          <div style={{ border: "1px solid var(--border)", background: "#fff", marginBottom: 20 }}>
+            <div style={{ background: "#FEF2F2", borderBottom: "1px solid #FECACA", padding: "10px 16px", display: "flex", alignItems: "center", gap: 6 }}>
+              <span className="live-dot" />
+              <span style={{ fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 10, color: "var(--accent-red)", letterSpacing: "0.08em", textTransform: "uppercase" }}>LIVE BROADCAST — Where to Watch</span>
             </div>
-            <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>{player.upcomingMatch.date}</div>
-            <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 10 }}>{player.upcomingMatch.venue}</div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>📺 Where to Watch</div>
-            {player.upcomingMatch.broadcast.map(b => (
-              <div key={b} style={{ fontSize: 12, color: "var(--text-secondary)", padding: "3px 0", borderBottom: "1px solid var(--border)" }}>{b}</div>
-            ))}
+            <div style={{ padding: "16px" }}>
+              <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 16, marginBottom: 4 }}>
+                {player.country} vs {player.upcomingMatch.opponent}
+              </div>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 2 }}>{player.upcomingMatch.date}</div>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 12 }}>📍 {player.upcomingMatch.venue}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 6 }}>
+                {player.upcomingMatch.broadcast.map(b => (
+                  <div key={b} style={{ fontSize: 12, color: "var(--text-secondary)", padding: "6px 10px", border: "1px solid var(--border)", borderRadius: 2, background: "var(--bg-secondary)" }}>
+                    📺 {b}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ── AI TACTICAL HACK ────────────────────────────── */}
+          <div style={{ border: "1px solid var(--border)", background: "#fff", marginBottom: 20 }}>
+            <div style={{ background: "var(--gold-light)", borderBottom: "1px solid #fde68a", padding: "10px 16px", display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 16 }}>🤖</span>
+              <span style={{ fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 10, color: "var(--accent-gold)", letterSpacing: "0.08em", textTransform: "uppercase" }}>AI TACTICAL ANALYSIS</span>
+            </div>
+            <div style={{ padding: "16px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
+              {/* Strengths + Weaknesses */}
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--green)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>✓ Strengths</div>
+                <ul style={{ paddingLeft: 14, marginBottom: 14 }}>
+                  {player.aiTactical.strengths.map((s, i) => <li key={i} style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 4 }}>{s}</li>)}
+                </ul>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--accent-red)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>⚠ Areas to Watch</div>
+                <ul style={{ paddingLeft: 14 }}>
+                  {player.aiTactical.weaknesses.map((w, i) => <li key={i} style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 4 }}>{w}</li>)}
+                </ul>
+              </div>
+              {/* Predicted Impact + Keywords */}
+              <div>
+                <div style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 2, padding: 10, marginBottom: 12 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Predicted Impact</div>
+                  <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.65, margin: 0 }}>{player.aiTactical.predictedImpact}</p>
+                </div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>Fan Search Trends</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                  {player.aiTactical.longTailKeywords.map((kw, i) => (
+                    <span key={i} style={{ fontSize: 10, color: "var(--accent-blue)", background: "#eff6ff", border: "1px solid #bfdbfe", padding: "3px 7px", borderRadius: 2 }}>{kw}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div style={{ fontSize: 9, color: "var(--text-muted)", fontStyle: "italic", padding: "0 16px 12px" }}>For entertainment purposes only. AI model: Gemini · Updated daily.</div>
           </div>
         </div>
 
-        {/* ── BLOCK 2: SUPPORTER KIT ─────────────────────── */}
-        <div style={{ border: "1px solid var(--border)", background: "#fff" }}>
-          <div style={{ background: "#111827", padding: "10px 14px" }}>
-            <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 14, color: "#fff", letterSpacing: "0.02em" }}>👕 SUPPORTER KIT</span>
-          </div>
-          <div style={{ padding: 14 }}>
-            <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 14 }}>
-              Rep {player.name} on match day. Our 3-Nation Heavyweight Hoodie features the embroidered tri-flag crest — perfect for showing your colors at the stadium.
-            </p>
-            <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
-              <div style={{ textAlign: "center", flex: 1 }}>
-                <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=150&q=85" alt="Hoodie"
-                  style={{ width: "100%", height: 100, objectFit: "cover", border: "1px solid var(--border)", borderRadius: 2 }} />
-                <div style={{ fontSize: 10, fontWeight: 600, marginTop: 4 }}>Hoodie</div>
-                <div style={{ fontSize: 10, color: "var(--text-muted)" }}>$45.00</div>
-              </div>
-              <div style={{ textAlign: "center", flex: 1 }}>
-                <img src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=150&q=85" alt="Cap"
-                  style={{ width: "100%", height: 100, objectFit: "cover", border: "1px solid var(--border)", borderRadius: 2 }} />
-                <div style={{ fontSize: 10, fontWeight: 600, marginTop: 4 }}>Cap</div>
-                <div style={{ fontSize: 10, color: "var(--text-muted)" }}>$24.99</div>
-              </div>
+        {/* ── RIGHT (40%) — Stats + Merch ─────────────────────── */}
+        <div style={{ flex: "0 0 340px", display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* ── KEY STATS GRID ─────────────────────────────── */}
+          <div style={{ border: "1px solid var(--border)", background: "#fff" }}>
+            <div style={{ background: "#111827", padding: "10px 16px" }}>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 14, color: "#fff", letterSpacing: "0.03em" }}>📊 KEY PERFORMANCE STATS</span>
             </div>
-            <Link href="/supporter-kit" style={{ textDecoration: "none" }}>
-              <button className="btn-black" style={{ width: "100%", justifyContent: "center", fontSize: 12, padding: "10px 0" }}>
-                🛒 SHOP SUPPORTER KIT →
-              </button>
-            </Link>
+            <div style={{ padding: "10px", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
+              {player.stats.map(s => (
+                <div key={s.label} style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 2, padding: "10px", textAlign: "center" }}>
+                  <div style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: 22, color: "var(--text-primary)", lineHeight: 1 }}>{s.value}</div>
+                  <div style={{ fontSize: 9, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 2 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+            {/* Quick facts */}
+            <div style={{ padding: "8px 16px 14px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+              {[{ l: "Age", v: player.age }, { l: "Caps", v: player.caps }, { l: "Goals", v: player.goals }].map(({ l, v }) => (
+                <div key={l} style={{ textAlign: "center" }}>
+                  <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 18 }}>{v}</div>
+                  <div style={{ fontSize: 9, color: "var(--text-muted)", textTransform: "uppercase" }}>{l}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* ── BLOCK 3: AI TACTICAL ANALYSIS ───────────────── */}
-        <div style={{ border: "1px solid var(--border)", background: "#fff" }}>
-          <div style={{ background: "var(--gold-light)", borderBottom: "1px solid #fde68a", padding: "10px 14px", display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 16 }}>🤖</span>
-            <span style={{ fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 10, color: "var(--accent-gold)", letterSpacing: "0.08em", textTransform: "uppercase" }}>AI TACTICAL ANALYSIS</span>
-          </div>
-          <div style={{ padding: 14 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--green)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Strengths</div>
-            <ul style={{ marginBottom: 14, paddingLeft: 16 }}>
-              {player.aiAnalysis.strengths.map((s, i) => (
-                <li key={i} style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 4 }}>{s}</li>
-              ))}
-            </ul>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--accent-red)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Areas to Watch</div>
-            <ul style={{ marginBottom: 14, paddingLeft: 16 }}>
-              {player.aiAnalysis.weaknesses.map((w, i) => (
-                <li key={i} style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 4 }}>{w}</li>
-              ))}
-            </ul>
-            <div style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 2, padding: 10, marginBottom: 4 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>Predicted Impact</div>
-              <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 0 }}>{player.aiAnalysis.predictedImpact}</p>
+          {/* ── SUPPORTER KIT MERCH ─────────────────────────── */}
+          <div style={{ border: "1px solid var(--border)", background: "#fff" }}>
+            <div style={{ background: "#111827", padding: "10px 16px" }}>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 14, color: "#fff", letterSpacing: "0.03em" }}>👕 {player.name.split(" ").pop()} SUPPORTER KIT</span>
             </div>
-            <div style={{ fontSize: 9, color: "var(--text-muted)", fontStyle: "italic", marginTop: 6 }}>For entertainment only. Not betting advice. AI model: Gemini · Updated daily.</div>
+            <div style={{ padding: "12px" }}>
+              {player.merch.map((item, idx) => (
+                <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: idx < player.merch.length - 1 ? "1px solid var(--border)" : "none" }}>
+                  <img src={item.img} alt={item.name} style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 2, flexShrink: 0, border: "1px solid var(--border)" }}
+                    onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", lineHeight: 1.3 }}>{item.name}</div>
+                    <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{item.price}</div>
+                  </div>
+                  <Link href="/supporter-kit" style={{ textDecoration: "none" }}>
+                    <button className="btn-black" style={{ fontSize: 10, padding: "6px 12px" }}>BUY</button>
+                  </Link>
+                </div>
+              ))}
+              <Link href="/supporter-kit" style={{ textDecoration: "none", display: "block", marginTop: 12 }}>
+                <button className="btn-black" style={{ width: "100%", justifyContent: "center", fontSize: 12, padding: "10px 0" }}>🛒 VIEW ALL SUPPORTER KIT</button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── Crosslink: other players ──────────────────────────── */}
-      <div style={{ borderTop: "1px solid var(--border)", paddingTop: 20 }}>
+      {/* ── MORE PLAYERS ──────────────────────────────────────── */}
+      <div style={{ borderTop: "1px solid var(--border)", marginTop: 32, paddingTop: 20 }}>
         <div className="section-head" style={{ marginBottom: 12 }}>
           <div className="bar" /><span className="title">MORE PLAYERS</span><div className="rule" />
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {Object.values(PLAYER_DB).filter(p => p.slug !== player.slug).slice(0, 6).map(p => (
+          {Object.values(PLAYER_DB).filter(p => p.slug !== player.slug).map(p => (
             <Link key={p.slug} href={`/players/${p.slug}`} style={{ textDecoration: "none" }}>
-              <span style={{
-                fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 500,
-                color: "var(--accent-blue)", cursor: "pointer",
-                padding: "4px 10px", border: "1px solid var(--border)", borderRadius: 2,
-                display: "inline-block", transition: "background 0.1s",
-              }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--bg-secondary)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-              >{p.name}</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: 12, fontWeight: 500, color: "var(--accent-blue)", cursor: "pointer", padding: "4px 10px", border: "1px solid var(--border)", borderRadius: 2, display: "inline-block" }}>{p.name}</span>
             </Link>
           ))}
         </div>
