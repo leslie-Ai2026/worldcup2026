@@ -1,6 +1,12 @@
 import { useRoute, Link } from "wouter";
+import worldcupData from "@/data/worldcup2026.json";
 
 const flagUrl = (code: string) => `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
+
+function getBroadcast(flagCode: string) {
+  const entry = (worldcupData.broadcasters as Record<string, any>)[flagCode];
+  return entry?.upcoming || null;
+}
 
 // ─── Country-Based Merch Catalog ─────────────────────────────────
 const COUNTRY_MERCH: Record<string, { name: string; price: string; img: string }[]> = {
@@ -36,7 +42,6 @@ interface PlayerData {
   age: number; caps: number; goals: number; flagCode: string; country: string;
   height: string; preferredFoot: string; marketValue: string;
   img: string; actionImg: string; bio: string;
-  upcomingMatch: { opponent: string; date: string; venue: string; broadcast: string[] };
   stats: { label: string; value: string }[];
   aiTactical: { strengths: string[]; weaknesses: string[]; longTailKeywords: string[]; predictedImpact: string; };
 }
@@ -49,10 +54,6 @@ const PLAYER_DB: Record<string, PlayerData> = {
     img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&q=85",
     actionImg: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=1200&q=85",
     bio: "Kylian Mbappé is the most electrifying forward in world football. The France captain and Real Madrid superstar arrives at the 2026 World Cup at his physical peak. After a record-breaking La Liga season, he is the undisputed favourite to claim both the Golden Boot and lead France to back-to-back World Cup titles.",
-    upcomingMatch: {
-      opponent: "Germany", date: "June 13, 2026 · 21:00", venue: "MetLife Stadium, New York",
-      broadcast: ["FOX Sports (United States)", "BBC One (United Kingdom)", "TF1 (France)", "TSN (Canada)", "ZDF (Germany)"],
-    },
     stats: [
       { label: "Goals/90", value: "0.82" }, { label: "xG/90", value: "0.74" },
       { label: "Shot Accuracy", value: "62%" }, { label: "Dribbles/90", value: "4.1" },
@@ -185,26 +186,41 @@ export default function PlayerProfile() {
           <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.7, fontStyle: "italic", marginBottom: 24 }}>{player.bio}</p>
 
           {/* ── LIVE BROADCAST ─────────────────────────────── */}
-          <div style={{ border: "1px solid var(--border)", background: "#fff", marginBottom: 20 }}>
-            <div style={{ background: "#FEF2F2", borderBottom: "1px solid #FECACA", padding: "10px 16px", display: "flex", alignItems: "center", gap: 6 }}>
-              <span className="live-dot" />
-              <span style={{ fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 10, color: "var(--accent-red)", letterSpacing: "0.08em", textTransform: "uppercase" }}>LIVE BROADCAST — Where to Watch</span>
-            </div>
-            <div style={{ padding: "16px" }}>
-              <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 16, marginBottom: 4 }}>
-                {player.country} vs {player.upcomingMatch.opponent}
-              </div>
-              <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 2 }}>{player.upcomingMatch.date}</div>
-              <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 12 }}>📍 {player.upcomingMatch.venue}</div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 6 }}>
-                {player.upcomingMatch.broadcast.map(b => (
-                  <div key={b} style={{ fontSize: 12, color: "var(--text-secondary)", padding: "6px 10px", border: "1px solid var(--border)", borderRadius: 2, background: "var(--bg-secondary)" }}>
-                    📺 {b}
+          {(() => {
+            const broadcast = getBroadcast(player.flagCode);
+            if (!broadcast) return null;
+            return (
+              <div style={{ border: "1px solid var(--border)", background: "#fff", marginBottom: 20 }}>
+                <div style={{ background: "#FEF2F2", borderBottom: "1px solid #FECACA", padding: "10px 16px", display: "flex", alignItems: "center", gap: 6 }}>
+                  <span className="live-dot" />
+                  <span style={{ fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 10, color: "var(--accent-red)", letterSpacing: "0.08em", textTransform: "uppercase" }}>LIVE BROADCAST — Where to Watch</span>
+                </div>
+                <div style={{ padding: "16px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                    <img src={flagUrl(player.flagCode)} alt="" style={{ width: 28, height: 20, objectFit: "contain", flexShrink: 0 }} />
+                    <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 16 }}>{broadcast.team}</span>
+                    <span style={{ fontSize: 12, color: "var(--text-muted)" }}>vs</span>
+                    <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 16 }}>{broadcast.opponent}</span>
+                    <img src={flagUrl(broadcast.opponentFlag)} alt="" style={{ width: 28, height: 20, objectFit: "contain", flexShrink: 0 }} />
                   </div>
-                ))}
+                  <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 2 }}>{broadcast.date} · {broadcast.time}</div>
+                  <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 2 }}>📍 {broadcast.venue}</div>
+                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 12, fontFamily: "var(--font-mono)" }}>{broadcast.stage}</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 6 }}>
+                    {broadcast.channels.map((ch: any) => (
+                      <a key={ch.name} href={ch.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+                        <div style={{ fontSize: 12, color: "var(--text-secondary)", padding: "6px 10px", border: "1px solid var(--border)", borderRadius: 2, background: "var(--bg-secondary)", transition: "background 0.1s", cursor: "pointer" }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#f3f4f6"; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "var(--bg-secondary)"; }}>
+                          📺 <strong>{ch.name}</strong> <span style={{ fontSize: 10, color: "var(--text-muted)" }}>· {ch.region}</span>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            );
+          })()}
 
           {/* ── AI TACTICAL HACK ────────────────────────────── */}
           <div style={{ border: "1px solid var(--border)", background: "#fff", marginBottom: 20 }}>

@@ -1,0 +1,166 @@
+{
+  "broadcasters": {
+    "mx": {
+      "team": "Mexico",
+      "flagCode": "mx",
+      "upcoming": {
+        "opponent": "South Africa",
+        "opponentFlag": "za",
+        "date": "June 11, 2026",
+        "time": "20:00 UTC",
+        "venue": "Estadio Azteca, Mexico City",
+        "stage": "Group A · Opening Match",
+        "channels": [
+          { "name": "FOX Sports", "region": "United States", "url": "https://www.foxsports.com/soccer" },
+          { "name": "Televisa", "region": "Mexico", "url": "https://televisa.com/deportes" },
+          { "name": "BBC One", "region": "United Kingdom", "url": "https://www.bbc.com/sport" },
+          { "name": "TSN", "region": "Canada", "url": "https://www.tsn.ca/soccer" },
+          { "name": "ESPN Deportes", "region": "Latin America", "url": "https://espndeportes.espn.com" },
+          { "name": "beIN Sports", "region": "MENA", "url": "https://www.beinsports.com" },
+          { "name": "Optus Sport", "region": "Australia", "url": "https://sport.optus.com.au" }
+        ]
+      }
+    },
+    "us": {
+      "team": "United States",
+      "flagCode": "us",
+      "upcoming": {
+        "opponent": "Brazil",
+        "opponentFlag": "br",
+        "date": "June 12, 2026",
+        "time": "18:00 UTC",
+        "venue": "SoFi Stadium, Los Angeles",
+        "stage": "Group A · Matchday 1",
+        "channels": [
+          { "name": "FOX Sports", "region": "United States", "url": "https://www.foxsports.com/soccer" },
+          { "name": "BBC One", "region": "United Kingdom", "url": "https://www.bbc.com/sport" },
+          { "name": "TSN", "region": "Canada", "url": "https://www.tsn.ca/soccer" },
+          { "name": "Globo", "region": "Brazil", "url": "https://globoesporte.globo.com" },
+          { "name": "ESPN", "region": "Latin America", "url": "https://www.espn.com/soccer" },
+          { "name": "beIN Sports", "region": "MENA", "url": "https://www.beinsports.com" },
+          { "name": "Optus Sport", "region": "Australia", "url": "https://sport.optus.com.au" }
+        ]
+      }
+    },
+    "fr": {
+      "team": "France",
+      "flagCode": "fr",
+      "upcoming": {
+        "opponent": "Germany",
+        "opponentFlag": "de",
+        "date": "June 13, 2026",
+        "time": "21:00 UTC",
+        "venue": "MetLife Stadium, New York",
+        "stage": "Group C · Matchday 1",
+        "channels": [
+          { "name": "FOX Sports", "region": "United States", "url": "https://www.foxsports.com/soccer" },
+          { "name": "BBC One", "region": "United Kingdom", "url": "https://www.bbc.com/sport" },
+          { "name": "TF1", "region": "France", "url": "https://www.tf1.fr/tf1/direct" },
+          { "name": "TSN", "region": "Canada", "url": "https://www.tsn.ca/soccer" },
+          { "name": "ZDF", "region": "Germany", "url": "https://www.zdf.de/sport" },
+          { "name": "beIN Sports", "region": "France/MENA", "url": "https://www.beinsports.com" },
+          { "name": "RAI", "region": "Italy", "url": "https://www.raiplay.it/sport" }
+        ]
+      }
+    },
+    "za": {
+      "team": "South Africa",
+      "flagCode": "za",
+      "upcoming": {
+        "opponent": "Mexico",
+        "opponentFlag": "mx",
+        "date": "June 11, 2026",
+        "time": "20:00 UTC",
+        "venue": "Estadio Azteca, Mexico City",
+        "stage": "Group A · Opening Match",
+        "channels": [
+          { "name": "SuperSport", "region": "South Africa", "url": "https://supersport.com" },
+          { "name": "FOX Sports", "region": "United States", "url": "https://www.foxsports.com/soccer" },
+          { "name": "BBC One", "region": "United Kingdom", "url": "https://www.bbc.com/sport" },
+          { "name": "Televisa", "region": "Mexico", "url": "https://televisa.com/deportes" },
+          { "name": "TSN", "region": "Canada", "url": "https://www.tsn.ca/soccer" }
+        ]
+      }
+    },
+    "ar": {
+      "team": "Argentina",
+      "flagCode": "ar",
+      "upcoming": {
+        "opponent": "England",
+        "opponentFlag": "gb",
+        "date": "June 14, 2026",
+        "time": "19:00 UTC",
+        "venue": "AT&T Stadium, Dallas",
+        "stage": "Group B · Matchday 1",
+        "channels": [
+          { "name": "FOX Sports", "region": "United States", "url": "https://www.foxsports.com/soccer" },
+          { "name": "BBC One", "region": "United Kingdom", "url": "https://www.bbc.com/sport" },
+          { "name": "TyC Sports", "region": "Argentina", "url": "https://www.tycsports.com" },
+          { "name": "TSN", "region": "Canada", "url": "https://www.tsn.ca/soccer" },
+          { "name": "ESPN", "region": "Latin America", "url": "https://www.espn.com/soccer" },
+          { "name": "Sky Sports", "region": "United Kingdom", "url": "https://www.skysports.com/football" }
+        ]
+      }
+    },
+    "br": {
+      "team": "Brazil",
+      "flagCode": "br",
+      "upcoming": {
+        "opponent": "United States",
+        "opponentFlag": "us",
+        "date": "June 12, 2026",
+        "time": "18:00 UTC",
+        "venue": "SoFi Stadium, Los Angeles",
+        "stage": "Group B · Matchday 1",
+        "channels": [
+          { "name": "FOX Sports", "region": "United States", "url": "https://www.foxsports.com/soccer" },
+          { "name": "BBC One", "region": "United Kingdom", "url": "https://www.bbc.com/sport" },
+          { "name": "Globo", "region": "Brazil", "url": "https://globoesporte.globo.com" },
+          { "name": "SporTV", "region": "Brazil", "url": "https://sportv.globo.com" },
+          { "name": "TSN", "region": "Canada", "url": "https://www.tsn.ca/soccer" },
+          { "name": "ESPN", "region": "Latin America", "url": "https://www.espn.com/soccer" }
+        ]
+      }
+    },
+    "de": {
+      "team": "Germany",
+      "flagCode": "de",
+      "upcoming": {
+        "opponent": "France",
+        "opponentFlag": "fr",
+        "date": "June 13, 2026",
+        "time": "21:00 UTC",
+        "venue": "MetLife Stadium, New York",
+        "stage": "Group C · Matchday 1",
+        "channels": [
+          { "name": "FOX Sports", "region": "United States", "url": "https://www.foxsports.com/soccer" },
+          { "name": "ZDF", "region": "Germany", "url": "https://www.zdf.de/sport" },
+          { "name": "BBC One", "region": "United Kingdom", "url": "https://www.bbc.com/sport" },
+          { "name": "TF1", "region": "France", "url": "https://www.tf1.fr/tf1/direct" },
+          { "name": "TSN", "region": "Canada", "url": "https://www.tsn.ca/soccer" },
+          { "name": "Sky Sport", "region": "Germany", "url": "https://sport.sky.de" }
+        ]
+      }
+    },
+    "gb": {
+      "team": "England",
+      "flagCode": "gb",
+      "upcoming": {
+        "opponent": "Argentina",
+        "opponentFlag": "ar",
+        "date": "June 14, 2026",
+        "time": "19:00 UTC",
+        "venue": "AT&T Stadium, Dallas",
+        "stage": "Group B · Matchday 1",
+        "channels": [
+          { "name": "BBC One", "region": "United Kingdom", "url": "https://www.bbc.com/sport" },
+          { "name": "FOX Sports", "region": "United States", "url": "https://www.foxsports.com/soccer" },
+          { "name": "ITV", "region": "United Kingdom", "url": "https://www.itv.com/sport" },
+          { "name": "TSN", "region": "Canada", "url": "https://www.tsn.ca/soccer" },
+          { "name": "Sky Sports", "region": "United Kingdom", "url": "https://www.skysports.com/football" },
+          { "name": "Optus Sport", "region": "Australia", "url": "https://sport.optus.com.au" }
+        ]
+      }
+    }
+  }
+}
