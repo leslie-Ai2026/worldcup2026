@@ -121,6 +121,15 @@ p { color: var(--text-secondary); line-height: 1.65; }
 @media (max-width: 767px) { .hide-mobile { display:none!important; } }
 @media (min-width: 768px) { .hide-desktop { display:none!important; } }
 
+/* ─── HOME PAGE MOBILE RESPONSIVE ─────────────────────── */
+@media (max-width: 767px) {
+  .home-two-col { flex-direction: column !important; }
+  .home-left-col { padding-right: 0 !important; }
+  .home-right-col { width: 100% !important; margin-top: 20px; }
+  .home-hero-img { height: 220px !important; }
+  .home-news-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    TAILWIND
    ═══════════════════════════════════════════════════════════════ */
