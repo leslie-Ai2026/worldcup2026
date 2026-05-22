@@ -15,9 +15,9 @@ const FONT_STYLES: Record<string, { name: string; value: string; weight: string 
 // PRODUCT CATALOG
 // ═══════════════════════════════════════════════════════════════
 const PRODUCT_CATALOG = {
-  tee:  { id: "tee",  title: "Official Tournament Tee (Bella+Canvas 3001)",  price: "$29.99", mockupImg: "/images/white-tee.png", defaultWidth: 200, defaultHeight: 110, initialX: 200, initialY: 195, desc: "Premium heavyweight combed cotton. Vintage unisex tailored fit." },
-  tote: { id: "tote", title: "Host City Canvas Tote (Eco-Friendly)",          price: "$19.99", mockupImg: "/images/tote.png",      defaultWidth: 180, defaultHeight: 160, initialX: 210, initialY: 190, desc: "100% certified organic cotton canvas. Sturdy handles for match-day gear." },
-  cap:  { id: "cap",  title: "Match-Day Retro Cap (Yupoong 6245CM)",          price: "$24.99", mockupImg: "/images/cap.png",       defaultWidth: 100, defaultHeight: 45,  initialX: 250, initialY: 230, desc: "Classic low-profile unstructured dad hat. Enzyme-washed premium twill." },
+  tee:  { id: "tee",  title: "Official Tournament Tee (Bella+Canvas 3001)",  price: "$29.99", mockupImg: "/images/white-tee.png", defaultWidth: 240, defaultHeight: 120, initialX: 180, initialY: 210, desc: "Premium heavyweight combed cotton. Vintage unisex tailored fit." },
+  tote: { id: "tote", title: "Host City Canvas Tote (Eco-Friendly)",          price: "$19.99", mockupImg: "/images/tote.png",      defaultWidth: 200, defaultHeight: 180, initialX: 200, initialY: 200, desc: "100% certified organic cotton canvas. Sturdy handles for match-day gear." },
+  cup:  { id: "cup",  title: "Premium Ceramic Mug (11oz)",                       price: "$14.99", mockupImg: "/images/cup.png",        defaultWidth: 120, defaultHeight: 100, initialX: 230, initialY: 240, desc: "Glossy white ceramic mug with wrap-around print. Microwave and dishwasher safe." },
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -175,7 +175,7 @@ export default function SupporterKit() {
                         fontSize: 11, textTransform: "uppercase", letterSpacing: "0.04em",
                         cursor: "pointer", textAlign: "center", transition: "all 0.15s",
                       }}>
-                        {item.id === "tee" ? "T-Shirt" : item.id === "tote" ? "Tote Bag" : "Cap"}
+                        {item.id === "tee" ? "T-Shirt" : item.id === "tote" ? "Tote Bag" : "Premium Cup"}
                       </button>
                     );
                   })}
