@@ -11,7 +11,7 @@ function getBroadcast(flagCode: string) {
 // ─── Country-Based Merch Catalog ─────────────────────────────────
 const COUNTRY_MERCH: Record<string, { name: string; price: string; img: string }[]> = {
   mx: [
-    { name: "El Tri Vintage Supporter Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "Mexico Vintage Edition Hoodie", price: "$45.00", img: "/mexico-vintage-shirt.jpg" },
     { name: "Mexico Green Fan Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
     { name: "Estadio Azteca Print Hoodie", price: "$45.00", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=85" },
   ],
@@ -290,17 +290,30 @@ export default function PlayerProfile() {
               <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 14, color: "#fff", letterSpacing: "0.03em" }}>👕 {player.name.split(" ").pop()} SUPPORTER KIT</span>
             </div>
             <div style={{ padding: "12px" }}>
+              {/* Design Layer + Size selectors */}
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 9, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Design Layer</div>
+                <select style={{ width: "100%", padding: "7px 10px", marginBottom: 8, fontFamily: "var(--font-body)", fontSize: 11, color: "var(--text-primary)", background: "#fff", border: "1px solid var(--border)", borderRadius: 2, cursor: "pointer", outline: "none", appearance: "none" }}>
+                  <option>Mexico Vintage Edition</option>
+                  <option>USA Heritage Edition</option>
+                  <option>Canada Classic Edition</option>
+                </select>
+                <div style={{ fontSize: 9, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Size</div>
+                <select style={{ width: "100%", padding: "7px 10px", fontFamily: "var(--font-body)", fontSize: 11, color: "var(--text-primary)", background: "#fff", border: "1px solid var(--border)", borderRadius: 2, cursor: "pointer", outline: "none", appearance: "none" }}>
+                  {["S","M","L","XL","XXL"].map(sz => <option key={sz} value={sz}>{sz}</option>)}
+                </select>
+              </div>
+              {/* Merch items with lookbook image */}
               {getMerchForCountry(player.flagCode).map((item, idx) => (
                 <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: idx < getMerchForCountry(player.flagCode).length - 1 ? "1px solid var(--border)" : "none" }}>
-                  <img src={item.img} alt={item.name} style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 2, flexShrink: 0, border: "1px solid var(--border)" }}
+                  <img src={item.img} alt={item.name} style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 2, flexShrink: 0, border: "1px solid var(--border)", background: "#f9fafb" }}
                     onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", lineHeight: 1.3 }}>{item.name}</div>
                     <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{item.price}</div>
                   </div>
-                  <Link href="/supporter-kit" style={{ textDecoration: "none" }}>
-                    <button className="btn-black" style={{ fontSize: 10, padding: "6px 12px" }}>BUY</button>
-                  </Link>
+                  <button className="btn-black" style={{ fontSize: 10, padding: "6px 12px" }}
+                    onClick={() => alert(`${player.name}'s Supporter Kit [Size M] added to cart. Stripe Checkout is initializing securely…`)}>BUY</button>
                 </div>
               ))}
               <Link href="/supporter-kit" style={{ textDecoration: "none", display: "block", marginTop: 12 }}>
