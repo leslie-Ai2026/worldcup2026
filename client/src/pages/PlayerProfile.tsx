@@ -9,30 +9,30 @@ function getBroadcast(flagCode: string) {
 }
 
 // ─── Country-Based Merch Catalog ─────────────────────────────────
-const COUNTRY_MERCH: Record<string, { name: string; price: string; img: string }[]> = {
+const COUNTRY_MERCH: Record<string, { name: string; price: string; img: string; fallback: string }[]> = {
   mx: [
-    { name: "Mexico Vintage Edition Hoodie", price: "$45.00", img: "/images/hoodie.png" },
-    { name: "Mexico Official Jersey Tee", price: "$29.99", img: "/images/jersey.png" },
-    { name: "Estadio Azteca Print Hoodie", price: "$45.00", img: "/images/hoodie.png" },
+    { name: "Mexico Official Jersey Tee", price: "$29.99", img: "/images/jersey.png", fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "Host City Canvas Tote", price: "$19.99", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85", fallback: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85" },
+    { name: "Match-Day Washed Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85", fallback: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
   ],
   fr: [
-    { name: "Les Bleus #10 Jersey Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
-    { name: "French Blue Supporter Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
-    { name: "Paris Victory Hoodie", price: "$45.00", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=85" },
+    { name: "Les Bleus Jersey Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85", fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "Host City Canvas Tote", price: "$19.99", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85", fallback: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85" },
+    { name: "Match-Day Washed Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85", fallback: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
   ],
   za: [
-    { name: "Bafana Bafana Supporter Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
-    { name: "South Africa Fan Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
-    { name: "Rainbow Nation Hoodie", price: "$45.00", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=85" },
+    { name: "Bafana Bafana Jersey Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85", fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "Host City Canvas Tote", price: "$19.99", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85", fallback: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85" },
+    { name: "Match-Day Washed Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85", fallback: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
   ],
   default: [
-    { name: "World Cup 2026 Supporter Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
-    { name: "Classic Fan Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
-    { name: "Stadium Ready Hoodie", price: "$45.00", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=85" },
+    { name: "World Cup 2026 Jersey Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85", fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "Host City Canvas Tote", price: "$19.99", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85", fallback: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85" },
+    { name: "Match-Day Washed Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85", fallback: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
   ],
 };
 
-function getMerchForCountry(flagCode: string): { name: string; price: string; img: string }[] {
+function getMerchForCountry(flagCode: string): { name: string; price: string; img: string; fallback: string }[] {
   return COUNTRY_MERCH[flagCode] || COUNTRY_MERCH.default;
 }
 
