@@ -1,189 +1,213 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 
 // ═══════════════════════════════════════════════════════════════
-// PRODUCT DATA
+// FONT CATALOG — 5 Premium Styles
 // ═══════════════════════════════════════════════════════════════
-const PRODUCTS = [
-  { id: 1, name: "Official Tournament Tee",     price: "$29.99", img: "/images/banner.png",     fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600&q=85", desc: "Premium heavyweight cotton. Classic athletic fit." },
-  { id: 2, name: "Host City Canvas Tote",        price: "$19.99", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&q=85", fallback: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&q=85", desc: "12oz natural canvas. Screen-print front panel." },
-  { id: 3, name: "Match-Day Washed Cap",          price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600&q=85", fallback: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600&q=85", desc: "Enzyme-washed cotton twill. Brass buckle." },
+const FONTS = [
+  { value: "Impact, sans-serif",                     label: "Athletic Block (Bold Retro)" },
+  { value: "'Playfair Display', serif",              label: "Vintage Serif (Luxury)" },
+  { value: "'Great Vibes', cursive",                 label: "Elegant Cursive (Chic)" },
+  { value: "'Inter', sans-serif",                    label: "Bold Sans (Modern)" },
+  { value: "Courier New, monospace",                 label: "Classic Typewriter (Raw)" },
 ];
 
-const COLORS = [
-  { code: "white", label: "White", hex: "#FFFFFF", border: "#D1D5DB" },
-  { code: "black", label: "Black", hex: "#111827", border: "#111827" },
-  { code: "sand",  label: "Sand",  hex: "#D4C5A9", border: "#B8A88A" },
-];
-const SIZES = ["S", "M", "L", "XL", "XXL"];
-
 // ═══════════════════════════════════════════════════════════════
-// INTERACTIVE CANVAS — Draggable + Resizable Print Layer
+// INTERACTIVE CUSTOMIZER
 // ═══════════════════════════════════════════════════════════════
-function InteractiveCanvas({
-  product, color, text, customImg,
-}: {
-  product: typeof PRODUCTS[0]; color: string; text: string; customImg: string | null;
-}) {
+function InteractiveCustomizer() {
+  const [text, setText] = useState("WORLD CUP HACKS\nLOS ANGELES 2026");
+  const [uploadedImg, setUploadedImg] = useState<string | null>(null);
+  const [fontFamily, setFontFamily] = useState("Impact, sans-serif");
+  const [position, setPosition] = useState({ x: 180, y: 220 });
+  const [dimensions, setDimensions] = useState({ width: 340, height: 160 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const dragStart = useRef({ x: 0, y: 0 });
+  const resizeStart = useRef({ width: 0, height: 0, mouseX: 0, mouseY: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  const [hovering, setHovering] = useState(false);
-  const [dragging, setDragging] = useState(false);
-  const [resizing, setResizing] = useState(false);
-  const dragStart = useRef({ x: 0, y: 0, left: 0, top: 0 });
-  const resizeStart = useRef({ x: 0, y: 0, w: 0, h: 0 });
 
-  // Print layer position + size (percentage of container)
-  const [pos, setPos] = useState({ left: 35, top: 25, width: 30, height: 25 });
+  // ── Drag ─────────────────────────────────────────────────
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).classList.contains("resize-handle")) return;
+    setIsDragging(true);
+    dragStart.current = { x: e.clientX - position.x, y: e.clientY - position.y };
+  };
 
-  const bgColor = COLORS.find(c => c.code === color)?.hex || "#FFFFFF";
-  const lines = text ? text.split("\n") : [];
-  const hasContent = !!customImg || lines.length > 0;
-  const showGuides = hovering || dragging || resizing;
-
-  // ── Drag handlers ──────────────────────────────────────────
-  const onMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
+  // ── Resize ───────────────────────────────────────────────
+  const handleResizeMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setDragging(true);
-    dragStart.current = {
-      x: e.clientX, y: e.clientY,
-      left: pos.left, top: pos.top,
-    };
-  }, [pos]);
-
-  const onResizeDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setResizing(true);
+    setIsResizing(true);
     resizeStart.current = {
-      x: e.clientX, y: e.clientY,
-      w: pos.width, h: pos.height,
+      width: dimensions.width, height: dimensions.height,
+      mouseX: e.clientX, mouseY: e.clientY,
     };
-  }, [pos]);
+  };
 
-  const globalListenersRef = useRef<((e: MouseEvent) => void) | null>(null);
-
-  // Attach global listeners when dragging/resizing
-  if (dragging || resizing) {
-    const handler = (e: MouseEvent) => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      if (dragging) {
-        const dx = ((e.clientX - dragStart.current.x) / rect.width) * 100;
-        const dy = ((e.clientY - dragStart.current.y) / rect.height) * 100;
-        setPos(prev => ({
-          ...prev,
-          left: Math.max(0, Math.min(100 - prev.width, dragStart.current.left + dx)),
-          top: Math.max(0, Math.min(100 - prev.height, dragStart.current.top + dy)),
-        }));
+  // ── Global move/up listeners ─────────────────────────────
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging) {
+        setPosition({ x: e.clientX - dragStart.current.x, y: e.clientY - dragStart.current.y });
       }
-      if (resizing) {
-        const dw = ((e.clientX - resizeStart.current.x) / rect.width) * 100;
-        const dh = ((e.clientY - resizeStart.current.y) / rect.height) * 100;
-        setPos(prev => ({
-          ...prev,
-          width: Math.max(10, Math.min(90 - prev.left, resizeStart.current.w + dw)),
-          height: Math.max(8, Math.min(80 - prev.top, resizeStart.current.h + dh)),
-        }));
+      if (isResizing) {
+        setDimensions({
+          width: Math.max(100, resizeStart.current.width + (e.clientX - resizeStart.current.mouseX)),
+          height: Math.max(60, resizeStart.current.height + (e.clientY - resizeStart.current.mouseY)),
+        });
       }
     };
-    const upHandler = () => { setDragging(false); setResizing(false); };
-    document.addEventListener("mousemove", handler);
-    document.addEventListener("mouseup", upHandler);
-    // Cleanup after one render
-    setTimeout(() => {
-      document.removeEventListener("mousemove", handler);
-      document.removeEventListener("mouseup", upHandler);
-    }, 0);
-  }
+    const handleMouseUp = () => { setIsDragging(false); setIsResizing(false); };
+    if (isDragging || isResizing) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, isResizing, dimensions, position]);
+
+  const handleBuy = () => {
+    alert("Custom supporter item added to cart. Stripe Checkout is initializing securely…");
+  };
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        position: "relative", width: "100%", aspectRatio: "1/1",
-        background: "#f9fafb", overflow: "hidden",
-        cursor: dragging || resizing ? "grabbing" : "default",
-      }}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => { setHovering(false); if (!dragging && !resizing) setDragging(false); setResizing(false); }}
-    >
-      {/* ── Base garment ──────────────────────────────── */}
-      <img src={product.img} alt={product.name}
-        style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
-        onError={e => { (e.target as HTMLImageElement).src = product.fallback; }} />
+    <div style={{ display: "flex", gap: 32, flexWrap: "wrap", background: "#fff", maxWidth: "100%" }}>
+      {/* ═══ LEFT: MOCKUP CANVAS ═══════════════════════════════ */}
+      <div ref={containerRef} style={{
+        flex: "1 1 600px", minWidth: 340,
+        height: 550, background: "#f9fafb",
+        border: "1px solid #e5e7eb", position: "relative",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        overflow: "hidden",
+      }}>
+        {/* Base tee image */}
+        <img
+          src="/images/white-tee.png"
+          alt="Premium White Classic T-Shirt"
+          style={{
+            position: "absolute", inset: 0, width: "100%", height: "100%",
+            objectFit: "contain", pointerEvents: "none",
+          }}
+          onError={e => { (e.target as HTMLImageElement).src = "/images/banner.png"; }}
+        />
 
-      {/* ── Color tint ─────────────────────────────────── */}
-      {color !== "white" && (
-        <div style={{ position: "absolute", inset: 0, background: bgColor, opacity: 0.06, mixBlendMode: "multiply", pointerEvents: "none" }} />
-      )}
-
-      {/* ═══ DRAGGABLE + RESIZABLE PRINT LAYER ══════════ */}
-      {hasContent && (
+        {/* ═══ DRAGGABLE + RESIZABLE PRINT LAYER ═════════════ */}
         <div
-          onMouseDown={onMouseDown}
           style={{
             position: "absolute",
-            left: `${pos.left}%`, top: `${pos.top}%`,
-            width: `${pos.width}%`, height: `${pos.height}%`,
-            border: showGuides ? "2px dashed rgba(17,24,39,0.30)" : "2px solid transparent",
-            cursor: "grab",
+            left: position.x, top: position.y,
+            width: dimensions.width, height: dimensions.height,
+            border: "1px dashed #9ca3af", cursor: "move",
             display: "flex", flexDirection: "column",
             alignItems: "center", justifyContent: "center",
-            gap: 2, zIndex: 10, userSelect: "none",
-          }}>
-          {/* Custom graphic — ghost ink print effect */}
-          {customImg && (
-            <img src={customImg} alt="Custom"
+            textAlign: "center", padding: 4, userSelect: "none",
+          }}
+          onMouseDown={handleMouseDown}
+        >
+          {/* Uploaded graphic — ghost ink screen-print */}
+          {uploadedImg && (
+            <img src={uploadedImg} alt="Custom"
               style={{
-                maxWidth: "100%", maxHeight: "65%", objectFit: "contain",
-                /* GHOST INK BLEND */
-                opacity: 0.75,
-                mixBlendMode: "multiply",
-                filter: "contrast(1.1) brightness(0.95)",
-                pointerEvents: "none",
+                position: "absolute", inset: 0, width: "100%", height: "100%",
+                objectFit: "contain", pointerEvents: "none",
+                mixBlendMode: "multiply", opacity: 0.75,
               }} />
           )}
 
-          {/* Multiline text — ghost ink */}
-          {lines.length > 0 && lines.map((line, i) => (
-            <div key={i} style={{
-              fontFamily: "var(--font-display)", fontWeight: 900,
-              fontSize: i === 0 ? "clamp(13px, 2.3vw, 26px)" : "clamp(20px, 3.8vw, 44px)",
-              color: "#111827", textTransform: "uppercase",
-              letterSpacing: "0.05em", lineHeight: 1, textAlign: "center",
-              opacity: 0.80, mixBlendMode: "multiply",
-              filter: "contrast(1.06) brightness(0.96)",
-              pointerEvents: "none",
-            }}>{line}</div>
-          ))}
+          {/* Multiline text — screen-printed */}
+          <p style={{
+            width: "100%", fontFamily, fontWeight: 900,
+            fontSize: dimensions.height * 0.2,
+            color: "#111827", whiteSpace: "pre-line",
+            letterSpacing: "0.02em", lineHeight: 1.1,
+            mixBlendMode: "multiply", opacity: 0.8,
+            pointerEvents: "none", margin: 0, padding: 0,
+          }}>
+            {text}
+          </p>
 
-          {/* ── Resize handle (visible on hover) ──────── */}
-          {showGuides && (
-            <div
-              onMouseDown={onResizeDown}
-              style={{
-                position: "absolute", bottom: -2, right: -2,
-                width: 14, height: 14,
-                background: "#111827", border: "1px solid #fff",
-                cursor: "nwse-resize", zIndex: 20,
-              }}
-            />
-          )}
+          {/* Anchor dots */}
+          <div style={{ position: "absolute", top: -6, left: -6, width: 12, height: 12, background: "#374151", borderRadius: "50%", opacity: 0.7 }} />
+          <div style={{ position: "absolute", top: -6, right: -6, width: 12, height: 12, background: "#374151", borderRadius: "50%", opacity: 0.7 }} />
+          <div style={{ position: "absolute", bottom: -6, left: -6, width: 12, height: 12, background: "#374151", borderRadius: "50%", opacity: 0.7 }} />
+
+          {/* Resize handle */}
+          <div className="resize-handle"
+            onMouseDown={handleResizeMouseDown}
+            style={{
+              position: "absolute", bottom: -6, right: -6,
+              width: 14, height: 14, background: "#111827",
+              border: "2px solid #fff", cursor: "se-resize", zIndex: 50,
+            }} />
         </div>
-      )}
+      </div>
 
-      {/* ── Placeholder hint ────────────────────────────── */}
-      {!hasContent && (
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--text-muted)", opacity: 0.5, letterSpacing: "0.06em" }}>
-            UPLOAD A GRAPHIC OR TYPE TEXT TO PREVIEW
-          </span>
+      {/* ═══ RIGHT: CONTROL PANEL ══════════════════════════════ */}
+      <div style={{
+        flex: "0 0 340px", display: "flex", flexDirection: "column", gap: 24,
+        padding: 24, border: "1px solid #e5e7eb",
+      }}>
+        {/* Font selector */}
+        <div>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#374151", marginBottom: 8 }}>Select Font Style</div>
+          <select
+            value={fontFamily}
+            onChange={e => setFontFamily(e.target.value)}
+            style={{ width: "100%", padding: "12px", fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 500, color: "#111827", background: "#fff", border: "1px solid #d1d5db", borderRadius: 0, outline: "none", cursor: "pointer" }}
+          >
+            {FONTS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+          </select>
         </div>
-      )}
 
-      {/* ── Color dot ─────────────────────────────────── */}
-      <div style={{ position: "absolute", bottom: 10, right: 10, pointerEvents: "none", zIndex: 20 }}>
-        <div style={{ width: 12, height: 12, borderRadius: "50%", background: bgColor, border: `1.5px solid ${COLORS.find(c => c.code === color)?.border || "#ccc"}` }} />
+        {/* Text input */}
+        <div>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#374151", marginBottom: 8 }}>Custom Text & Layout</div>
+          <textarea
+            rows={3}
+            value={text}
+            onChange={e => setText(e.target.value)}
+            placeholder="Type custom lines here... (Press Enter for next line)"
+            style={{ width: "100%", padding: "12px", fontFamily: "var(--font-body)", fontSize: 13, color: "#111827", background: "#fff", border: "1px solid #d1d5db", borderRadius: 0, outline: "none", resize: "none" }}
+            onFocus={e => (e.target.style.borderColor = "#111827")}
+            onBlur={e => (e.target.style.borderColor = "#d1d5db")}
+          />
+        </div>
+
+        {/* Image upload */}
+        <div>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#374151", marginBottom: 8 }}>Upload Branding Image</div>
+          <label style={{
+            display: "flex", alignItems: "center", gap: 16,
+            fontFamily: "var(--font-body)", fontSize: 13, color: "var(--text-secondary)",
+            background: "#fff", border: "1px solid #d1d5db", padding: 0, cursor: "pointer",
+          }}>
+            <span style={{
+              background: "#111827", color: "#fff", padding: "10px 16px",
+              fontSize: 11, fontWeight: 700, letterSpacing: "0.04em",
+            }}>CHOOSE FILE</span>
+            <span style={{ fontSize: 12 }}>{uploadedImg ? "Image loaded ✓" : "No file chosen"}</span>
+            <input type="file" accept="image/*" hidden
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (file) setUploadedImg(URL.createObjectURL(file));
+              }} />
+          </label>
+        </div>
+
+        {/* Buy button */}
+        <button onClick={handleBuy} style={{
+          width: "100%", padding: "16px 0", background: "#111827", color: "#fff",
+          fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 13,
+          letterSpacing: "0.1em", textTransform: "uppercase",
+          border: "none", borderRadius: 0, cursor: "pointer", marginTop: "auto",
+          transition: "background 0.15s",
+        }}
+          onMouseEnter={e => (e.currentTarget.style.background = "#1f2937")}
+          onMouseLeave={e => (e.currentTarget.style.background = "#111827")}
+        >
+          Buy Now Securely
+        </button>
       </div>
     </div>
   );
@@ -193,97 +217,14 @@ function InteractiveCanvas({
 // PAGE
 // ═══════════════════════════════════════════════════════════════
 export default function SupporterKit() {
-  const [color, setColor] = useState<Record<number, string>>({});
-  const [size, setSize] = useState<Record<number, string>>({});
-  const [text, setText] = useState<Record<number, string>>({});
-  const [customImg, setCustomImg] = useState<Record<number, string | null>>({});
-  const fileRefs = useRef<Record<number, HTMLInputElement | null>>({});
-
-  const handleUpload = (pid: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = ev => setCustomImg(prev => ({ ...prev, [pid]: ev.target?.result as string }));
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const clearImg = (pid: number) => {
-    setCustomImg(prev => ({ ...prev, [pid]: null }));
-    if (fileRefs.current[pid]) fileRefs.current[pid]!.value = "";
-  };
-
-  const handleBuy = (p: typeof PRODUCTS[0]) => {
-    const c = COLORS.find(x => x.code === (color[p.id] || "white"))?.label || "White";
-    const s = size[p.id] || "M";
-    const t = text[p.id] || "";
-    alert(`${p.name} [${c}, ${s}]${t ? ` — "${t.replace(/\n/g, " ")}"` : ""} added to cart. Stripe Checkout is initializing securely…`);
-  };
-
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 20px 40px", background: "#fff" }}>
       <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "clamp(28px, 5vw, 38px)", textAlign: "center", marginBottom: 4 }}>THE SUPPORTER KIT</h1>
-      <p style={{ fontSize: 14, color: "var(--text-secondary)", textAlign: "center", marginBottom: 32 }}>Upload. Reposition. Resize. Print.</p>
+      <p style={{ fontSize: 14, color: "var(--text-secondary)", textAlign: "center", marginBottom: 32 }}>Customize. Print. Wear. One design. Infinite styles.</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, marginBottom: 40 }}>
-        {PRODUCTS.map(p => {
-          const activeColor = color[p.id] || "white";
-          const activeText = text[p.id] || "";
-          const activeImg = customImg[p.id] || null;
+      <InteractiveCustomizer />
 
-          return (
-            <div key={p.id} style={{ border: "1px solid var(--border)", background: "#fff" }}>
-              <InteractiveCanvas product={p} color={activeColor} text={activeText} customImg={activeImg} />
-
-              <div style={{ padding: "16px" }}>
-                <h3 style={{ fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 15, marginBottom: 2 }}>{p.name}</h3>
-                <p style={{ fontSize: 11, color: "var(--text-secondary)", marginBottom: 10 }}>{p.desc}</p>
-
-                {/* Color */}
-                <div style={{ fontSize: 9, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>Color</div>
-                <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
-                  {COLORS.map(c => (
-                    <button key={c.code} onClick={() => setColor(prev => ({ ...prev, [p.id]: c.code }))} title={c.label}
-                      style={{ width: 28, height: 28, borderRadius: "50%", background: c.hex, border: (activeColor === c.code ? "3px solid #111827" : `2px solid ${c.border}`), cursor: "pointer", outline: "none", boxShadow: activeColor === c.code ? "0 0 0 2px rgba(0,0,0,0.1)" : "none" }} />
-                  ))}
-                </div>
-
-                {/* Graphic Upload */}
-                <div style={{ fontSize: 9, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Custom Graphic</div>
-                <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-                  <input ref={el => { fileRefs.current[p.id] = el; }} type="file" accept="image/*" onChange={e => handleUpload(p.id, e)}
-                    style={{ flex: 1, padding: "6px 8px", fontFamily: "var(--font-body)", fontSize: 10, color: "var(--text-secondary)", background: "#fff", border: "1px solid var(--border)", borderRadius: 2, outline: "none" }} />
-                  {activeImg && <button onClick={() => clearImg(p.id)} style={{ fontFamily: "var(--font-body)", fontSize: 10, color: "var(--accent-red)", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 2, padding: "4px 8px", cursor: "pointer", whiteSpace: "nowrap" }}>✕</button>}
-                </div>
-
-                {/* Text */}
-                <div style={{ fontSize: 9, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Custom Text / Number</div>
-                <textarea value={activeText} onChange={e => setText(prev => ({ ...prev, [p.id]: e.target.value.slice(0, 40) }))}
-                  placeholder={"Name on line 1\nNumber on line 2  (e.g., 26)"} rows={2} maxLength={40}
-                  style={{ width: "100%", padding: "8px 10px", marginBottom: 10, fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, color: "#111827", background: "#fff", border: "1px solid var(--border)", borderRadius: 2, outline: "none", letterSpacing: "0.06em", resize: "none" }}
-                  onFocus={e => (e.target.style.borderColor = "#111827")} onBlur={e => (e.target.style.borderColor = "var(--border)")} />
-
-                {/* Size */}
-                <div style={{ fontSize: 9, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Size</div>
-                <div style={{ display: "flex", gap: 3, marginBottom: 16, flexWrap: "wrap" }}>
-                  {SIZES.map(sz => {
-                    const active = (size[p.id] || "M") === sz;
-                    return <button key={sz} onClick={() => setSize(prev => ({ ...prev, [p.id]: sz }))} style={{ fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: active ? 600 : 400, color: active ? "#fff" : "var(--text-secondary)", background: active ? "#111827" : "#fff", border: `1px solid ${active ? "#111827" : "var(--border)"}`, borderRadius: 2, padding: "4px 8px", cursor: "pointer" }}>{sz}</button>;
-                  })}
-                </div>
-
-                {/* Price + Buy */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 20 }}>{p.price}</span>
-                  <button onClick={() => handleBuy(p)} className="btn-black" style={{ fontSize: 12, padding: "9px 22px" }}>BUY NOW</button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div style={{ border: "1px solid var(--border)", padding: "14px 20px", display: "flex", justifyContent: "center", gap: 32, flexWrap: "wrap", background: "var(--bg-secondary)" }}>
+      <div style={{ border: "1px solid var(--border)", padding: "14px 20px", display: "flex", justifyContent: "center", gap: 32, flexWrap: "wrap", background: "var(--bg-secondary)", marginTop: 32 }}>
         {["🚚 Free shipping over $50", "🌱 Printed on demand · Zero waste", "🇺🇸 Made in the USA"].map(t => (
           <span key={t} style={{ fontSize: 12, color: "var(--text-secondary)", fontWeight: 500 }}>{t}</span>
         ))}
