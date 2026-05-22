@@ -116,3 +116,5 @@ server/data/
 cloudflared.exe
 ngrok.exe
 .project-config.json
+
+.vercel
