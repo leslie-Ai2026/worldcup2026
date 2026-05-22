@@ -12,7 +12,7 @@ const PRODUCTS = [
     id: 1,
     name: "Vintage 3-Nation Hoodie",
     price: "$45.00",
-    img: "/hoodie.png",
+    img: "/images/hoodie.png",
     imgFallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600&q=85&fit=crop",
     desc: "400gsm brushed fleece. Embroidered tri-flag crest. Premium lookbook edition.",
   },

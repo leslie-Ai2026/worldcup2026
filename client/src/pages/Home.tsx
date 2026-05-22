@@ -84,7 +84,7 @@ export default function Home() {
           {/* Hero Poster — clickable to match */}
           <Link href={`/match/${MATCHES[0].id}`} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
           <div style={{ border: "1px solid var(--border)", overflow: "hidden", position: "relative", cursor: "pointer" }}>
-            <img className="home-hero-img" src="/banner.png" alt="World Cup 2026" style={{ width: "100%", height: 400, objectFit: "cover", display: "block" }}
+            <img className="home-hero-img" src="/images/banner.png" alt="World Cup 2026" style={{ width: "100%", height: 400, objectFit: "cover", display: "block" }}
               onError={e => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=1200&q=85"; }} />
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.35) 65%, transparent 100%)", padding: "32px 20px 18px" }}>
               <span style={{ display: "inline-block", fontFamily: "var(--font-body)", fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#f5c842", background: "rgba(255,255,255,0.12)", padding: "2px 7px", borderRadius: 2, marginBottom: 8 }}>{NEWS[0].tag}</span>
