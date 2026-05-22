@@ -1,5 +1,13 @@
 {
   "outputDirectory": "dist/public",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.worldcuphacks.com" }],
+      "permanent": true,
+      "destination": "https://worldcuphacks.com/$1"
+    }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

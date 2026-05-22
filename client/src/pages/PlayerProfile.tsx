@@ -306,7 +306,7 @@ export default function PlayerProfile() {
               {/* Merch items with lookbook image */}
               {getMerchForCountry(player.flagCode).map((item, idx) => (
                 <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: idx < getMerchForCountry(player.flagCode).length - 1 ? "1px solid var(--border)" : "none" }}>
-                  <img src={item.img} alt={item.name} style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 2, flexShrink: 0, border: "1px solid var(--border)", background: "#f9fafb" }}
+                  <img src={item.img} alt={`${player.country} ${item.name} — premium World Cup 2026 supporter merchandise`} style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 2, flexShrink: 0, border: "1px solid var(--border)", background: "#f9fafb" }}
                     onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", lineHeight: 1.3 }}>{item.name}</div>

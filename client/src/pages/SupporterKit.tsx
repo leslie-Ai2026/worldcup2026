@@ -55,7 +55,7 @@ export default function SupporterKit() {
             {/* PRODUCT IMAGE */}
             <img
               src={p.img}
-              alt={p.name}
+              alt={`${p.name} — premium World Cup 2026 supporter apparel lookbook edition`}
               style={{ width: "100%", height: 360, objectFit: "cover", display: "block", background: "#f9fafb" }}
               onError={e => { (e.target as HTMLImageElement).src = p.imgFallback || "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600&q=85"; }}
             />
