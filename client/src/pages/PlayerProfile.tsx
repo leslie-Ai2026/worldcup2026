@@ -11,22 +11,22 @@ function getBroadcast(flagCode: string) {
 // ─── Country-Based Merch Catalog ─────────────────────────────────
 const COUNTRY_MERCH: Record<string, { name: string; price: string; img: string; fallback: string }[]> = {
   mx: [
-    { name: "Mexico Official Jersey Tee", price: "$29.99", img: "/images/jersey.png", fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "Official Tournament Tee", price: "$29.99", img: "/images/jersey.png", fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
     { name: "Host City Canvas Tote", price: "$19.99", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85", fallback: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85" },
     { name: "Match-Day Washed Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85", fallback: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
   ],
   fr: [
-    { name: "Les Bleus Jersey Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85", fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "Official Tournament Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85", fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
     { name: "Host City Canvas Tote", price: "$19.99", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85", fallback: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85" },
     { name: "Match-Day Washed Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85", fallback: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
   ],
   za: [
-    { name: "Bafana Bafana Jersey Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85", fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "Official Tournament Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85", fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
     { name: "Host City Canvas Tote", price: "$19.99", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85", fallback: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85" },
     { name: "Match-Day Washed Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85", fallback: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
   ],
   default: [
-    { name: "World Cup 2026 Jersey Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85", fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
+    { name: "Official Tournament Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85", fallback: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
     { name: "Host City Canvas Tote", price: "$19.99", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85", fallback: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=300&q=85" },
     { name: "Match-Day Washed Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85", fallback: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
   ],
@@ -312,8 +312,9 @@ export default function PlayerProfile() {
                     <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", lineHeight: 1.3 }}>{item.name}</div>
                     <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{item.price}</div>
                   </div>
-                  <button className="btn-black" style={{ fontSize: 10, padding: "6px 12px" }}
-                    onClick={() => alert(`${player.name}'s Supporter Kit [Size M] added to cart. Stripe Checkout is initializing securely…`)}>BUY</button>
+                  <Link href="/supporter-kit" style={{ textDecoration: "none" }}>
+                    <button className="btn-black" style={{ fontSize: 10, padding: "6px 12px" }}>BUY</button>
+                  </Link>
                 </div>
               ))}
               <Link href="/supporter-kit" style={{ textDecoration: "none", display: "block", marginTop: 12 }}>
