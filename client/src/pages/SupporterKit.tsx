@@ -15,9 +15,9 @@ const FONT_STYLES: Record<string, { name: string; value: string; weight: string 
 // PRODUCT CATALOG
 // ═══════════════════════════════════════════════════════════════
 const PRODUCT_CATALOG = {
-  tee:  { id: "tee",  title: "Official Tournament Tee",  price: "$29.99", mockupImg: "/images/white-tee.png", defaultWidth: 280, defaultHeight: 140, initialX: 160, initialY: 180, desc: "Premium heavyweight organic cotton. Tailored vintage boxy fit." },
-  tote: { id: "tote", title: "Host City Canvas Tote",     price: "$19.99", mockupImg: "/images/tote.png",      defaultWidth: 200, defaultHeight: 120, initialX: 200, initialY: 240, desc: "12oz ultra-durable natural raw canvas. Perfect for match-day gear." },
-  cap:  { id: "cap",  title: "Match-Day Washed Cap",       price: "$24.99", mockupImg: "/images/cap.png",       defaultWidth: 120, defaultHeight: 55,  initialX: 240, initialY: 195, desc: "Enzyme-washed premium cotton twill. Adjustable classic brass buckle." },
+  tee:  { id: "tee",  title: "Official Tournament Tee (Bella+Canvas 3001)",  price: "$29.99", mockupImg: "/images/white-tee.png", defaultWidth: 200, defaultHeight: 110, initialX: 200, initialY: 195, desc: "Premium heavyweight combed cotton. Vintage unisex tailored fit." },
+  tote: { id: "tote", title: "Host City Canvas Tote (Eco-Friendly)",          price: "$19.99", mockupImg: "/images/tote.png",      defaultWidth: 180, defaultHeight: 160, initialX: 210, initialY: 190, desc: "100% certified organic cotton canvas. Sturdy handles for match-day gear." },
+  cap:  { id: "cap",  title: "Match-Day Retro Cap (Yupoong 6245CM)",          price: "$24.99", mockupImg: "/images/cap.png",       defaultWidth: 100, defaultHeight: 45,  initialX: 250, initialY: 230, desc: "Classic low-profile unstructured dad hat. Enzyme-washed premium twill." },
 };
 
 // ═══════════════════════════════════════════════════════════════
