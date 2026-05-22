@@ -11,9 +11,9 @@ function getBroadcast(flagCode: string) {
 // ─── Country-Based Merch Catalog ─────────────────────────────────
 const COUNTRY_MERCH: Record<string, { name: string; price: string; img: string }[]> = {
   mx: [
-    { name: "Mexico Vintage Edition Hoodie", price: "$45.00", img: "/mexico-vintage-shirt.jpg" },
-    { name: "Mexico Green Fan Cap", price: "$24.99", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&q=85" },
-    { name: "Estadio Azteca Print Hoodie", price: "$45.00", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=85" },
+    { name: "Mexico Vintage Edition Hoodie", price: "$45.00", img: "/hoodie.png" },
+    { name: "Mexico Official Jersey Tee", price: "$29.99", img: "/jersey.png" },
+    { name: "Estadio Azteca Print Hoodie", price: "$45.00", img: "/hoodie.png" },
   ],
   fr: [
     { name: "Les Bleus #10 Jersey Tee", price: "$29.99", img: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&q=85" },
