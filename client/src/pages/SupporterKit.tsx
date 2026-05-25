@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { ALL_PLAYERS } from "@/data/worldcup2026.js";
 
 // ═══════════════════════════════════════════════════════════════
 // PREMIUM FONTS
@@ -228,6 +229,28 @@ export default function SupporterKit() {
         <div style={{ textAlign: "center", marginBottom: 64, borderBottom: "1px solid #f3f4f6", paddingBottom: 24 }}>
           <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "clamp(26px, 4vw, 34px)", color: "#111827", textTransform: "uppercase", marginBottom: 6 }}>The 2026 Supporter Kit</h1>
           <p style={{ fontSize: 11, color: "#9ca3af", letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 600 }}>Instant Customization · Synchronized with Printful OEM</p>
+        </div>
+
+        {/* ── Player Quick-Selector ──────────────────────── */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
+          <select
+            defaultValue=""
+            onChange={e => {
+              if (!e.target.value) return;
+              const player = ALL_PLAYERS.find(p => p.display === e.target.value);
+              if (player) setText(player.defaultText);
+            }}
+            style={{
+              width: "100%", maxWidth: 480, padding: "12px 16px",
+              fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 600,
+              color: "#111827", background: "#fff", border: "1px solid #d1d5db",
+              borderRadius: 0, outline: "none", cursor: "pointer", appearance: "none",
+            }}>
+            <option value="">⚽ Select a player to auto-fill name & number…</option>
+            {ALL_PLAYERS.map(p => (
+              <option key={p.countryId + p.number} value={p.display}>{p.display}</option>
+            ))}
+          </select>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 32 }}>
