@@ -1,4 +1,5 @@
 import { useRoute, Link } from "wouter";
+import { PLAYER_BY_SLUG, ALL_PLAYERS_DB } from "@/data/worldcup2026-generated.js";
 import worldcupData from "@/data/worldcup2026.json";
 
 const flagUrl = (code: string) => `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
@@ -116,6 +117,44 @@ export default function PlayerProfile() {
   const [, params] = useRoute("/players/:slug");
   const slug = params?.slug || "kylian-mbappe";
   const player = PLAYER_DB[slug];
+
+  // Fallback to generated database if not in hardcoded profiles
+  const generatedPlayer = PLAYER_BY_SLUG[slug];
+  if (!player && generatedPlayer) {
+    const gp = generatedPlayer;
+    return (
+      <div style={{ maxWidth: 960, margin: "60px auto", padding: "20px 20px 40px", background: "#fff" }}>
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <img src={`https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=400&q=85`} alt={gp.name} style={{ width: 140, height: 140, borderRadius: "50%", objectFit: "cover", border: "4px solid #e5e7eb", marginBottom: 16 }} />
+          <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "clamp(28px, 4vw, 40px)", marginBottom: 4 }}>{gp.name}</h1>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+            <img src={`https://flagcdn.com/w80/${gp.flagCode}.png`} alt="" style={{ width: 24, height: 16, objectFit: "contain" }} />
+            <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>{gp.country} · #{gp.number} · {gp.position}</span>
+          </div>
+          <div style={{ fontSize: 14, color: "var(--text-secondary)" }}>{gp.club} · {gp.marketValue}</div>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12, maxWidth: 600, margin: "0 auto 28px" }}>
+          {[{ l: "Age", v: gp.age }, { l: "Caps", v: gp.caps }, { l: "Goals", v: gp.goals }, { l: "Market Value", v: gp.marketValue }].map(s => (
+            <div key={s.l} style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 4, padding: "14px 10px", textAlign: "center" }}>
+              <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 22 }}>{s.v}</div>
+              <div style={{ fontSize: 9, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.l}</div>
+            </div>
+          ))}
+        </div>
+        {gp.aiPrediction > 0 && (
+          <div style={{ maxWidth: 500, margin: "0 auto 20px", background: "#fef3c7", border: "1px solid #fde68a", borderRadius: 4, padding: "14px 18px", textAlign: "center" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent-gold)" }}>🤖 AI Prediction: </span>
+            <span style={{ fontSize: 14, fontWeight: 700 }}>{gp.aiPrediction} goals projected in 2026 World Cup</span>
+          </div>
+        )}
+        <div style={{ textAlign: "center" }}>
+          <Link href="/supporter-kit" style={{ textDecoration: "none" }}>
+            <button className="btn-black" style={{ padding: "12px 24px" }}>🛒 Customize {gp.name.split(" ").pop()}'s Jersey</button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!player) {
     return (
