@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ALL_FEATURED } from "@/data/worldcup2026.js";
+import { ALL_PLAYERS } from "@/data/worldcup2026.js";
 
 const flagUrl = (code: string) => `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
 
