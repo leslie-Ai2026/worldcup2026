@@ -4,7 +4,7 @@ import { ALL_PLAYERS } from "@/data/worldcup2026.js";
 const flagUrl = (code: string) => `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
 
 // Top 16 featured players — forwards + key midfielders from top nations
-const FEATURED = ALL_FEATURED
+const FEATURED = ALL_PLAYERS
   .filter((p: any) => ["FW", "MF"].includes(p.position))
   .slice(0, 16)
   .map((p: any, i: number) => ({
