@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useVoterId } from "@/hooks/useVoterId";
 import { Link, useLocation } from "wouter";
+import { OPENING_FIXTURES } from "@/data/worldcup2026.js";
 
 function useCountdown() {
   const target = new Date("2026-06-11T20:00:00Z").getTime();
@@ -23,12 +24,31 @@ const NEWS = [
   { id: 4, tag: "FORM GUIDE", tagColor: "#16A34A", title: "USA's home advantage — how far can the hosts really go?", img: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=300&q=80&fit=crop", time: "8h ago" },
 ];
 
-const MATCHES = [
-  { id: "mex-vs-rsa", home: "MEX", homeCode: "mx", away: "RSA", awayCode: "za", date: "JUN 11", time: "20:00", venue: "Estadio Azteca, Mexico City" },
-  { id: "usa-vs-bra", home: "USA", homeCode: "us", away: "BRA", awayCode: "br", date: "JUN 12", time: "18:00", venue: "SoFi Stadium, Los Angeles" },
-  { id: "fra-vs-ger", home: "FRA", homeCode: "fr", away: "GER", awayCode: "de", date: "JUN 13", time: "21:00", venue: "MetLife Stadium, New York" },
-  { id: "arg-vs-eng", home: "ARG", homeCode: "ar", away: "ENG", awayCode: "gb", date: "JUN 14", time: "19:00", venue: "AT&T Stadium, Dallas" },
-];
+const COUNTRIES = {
+  Mexico: "mx", Canada: "ca", USA: "us", Paraguay: "py",
+  Brazil: "br", Argentina: "ar", Colombia: "co", "South Korea": "kr",
+  France: "fr", Germany: "de", Japan: "jp", Czechia: "cz",
+  Spain: "es", Netherlands: "nl", Senegal: "sn", Bosnia: "ba",
+  England: "gb", Portugal: "pt", Morocco: "ma", Norway: "no",
+  Italy: "it", Uruguay: "uy", Egypt: "eg", Chile: "cl",
+  Belgium: "be", Croatia: "hr", "South Africa": "za", Iran: "ir",
+  Nigeria: "ng", Australia: "au", Peru: "pe", "Saudi Arabia": "sa",
+  Switzerland: "ch", Denmark: "dk", Ecuador: "ec", "New Zealand": "nz",
+  Austria: "at", Serbia: "rs", Qatar: "qa", Jamaica: "jm",
+  Sweden: "se", Poland: "pl", Ukraine: "ua", Mali: "ml",
+  Hungary: "hu", Scotland: "gb", Algeria: "dz", Panama: "pa",
+};
+
+const MATCHES = OPENING_FIXTURES.slice(0, 4).map(f => ({
+  id: f.id,
+  home: f.home.substring(0, 3).toUpperCase(),
+  homeCode: COUNTRIES[f.home] || f.home.slice(0, 2).toLowerCase(),
+  away: f.away.substring(0, 3).toUpperCase(),
+  awayCode: COUNTRIES[f.away] || f.away.slice(0, 2).toLowerCase(),
+  date: f.date.split(",")[0].replace("June", "JUN").replace("July", "JUL").toUpperCase(),
+  time: f.time,
+  venue: f.venue,
+}));
 
 const TEAMS = [
   { code: "fr", name: "France" }, { code: "ar", name: "Argentina" }, { code: "br", name: "Brazil" }, { code: "gb", name: "England" },
