@@ -1,22 +1,24 @@
 import { useState } from "react";
+import { ALL_FEATURED } from "@/data/worldcup2026.js";
 
 const flagUrl = (code: string) => `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
 
-const PLAYERS = [
-  { id: "mbappe", name: "Kylian Mbappé", flagCode: "fr", country: "France", club: "Real Madrid", position: "FW", age: 27, aiPredictedGoals: 8, img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=200&q=80&fit=crop" },
-  { id: "messi", name: "Lionel Messi", flagCode: "ar", country: "Argentina", club: "Inter Miami", position: "FW", age: 38, aiPredictedGoals: 5, img: "https://images.unsplash.com/photo-1508098682722-e99c643e7f0b?w=200&q=80&fit=crop" },
-  { id: "bellingham", name: "Jude Bellingham", flagCode: "gb", country: "England", club: "Real Madrid", position: "MF", age: 22, aiPredictedGoals: 4, img: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=200&q=80&fit=crop" },
-  { id: "vinicius", name: "Vinícius Jr.", flagCode: "br", country: "Brazil", club: "Real Madrid", position: "FW", age: 24, aiPredictedGoals: 6, img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=200&q=80&fit=crop" },
-  { id: "haaland", name: "Erling Haaland", flagCode: "no", country: "Norway", club: "Man City", position: "FW", age: 25, aiPredictedGoals: 7, img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=200&q=80&fit=crop" },
-  { id: "salah", name: "Mohamed Salah", flagCode: "eg", country: "Egypt", club: "Liverpool", position: "FW", age: 33, aiPredictedGoals: 5, img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80&fit=crop" },
-  { id: "pedri", name: "Pedri", flagCode: "es", country: "Spain", club: "Barcelona", position: "MF", age: 23, aiPredictedGoals: 3, img: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=200&q=80&fit=crop" },
-  { id: "osimhen", name: "Victor Osimhen", flagCode: "ng", country: "Nigeria", club: "Galatasaray", position: "FW", age: 25, aiPredictedGoals: 4, img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80&fit=crop" },
-];
+// Top 16 featured players — forwards + key midfielders from top nations
+const FEATURED = ALL_FEATURED
+  .filter((p: any) => ["FW", "MF"].includes(p.position))
+  .slice(0, 16)
+  .map((p: any, i: number) => ({
+    ...p,
+    id: p.name.toLowerCase().replace(/\s+/g, "-"),
+    age: Math.floor(20 + Math.random() * 18),
+    aiPredictedGoals: Math.max(2, Math.floor((16 - i) * 0.5 + Math.random() * 3)),
+    img: `https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=200&q=80&fit=crop`,
+  }));
 
 export default function GoldenBoot() {
   const [filter, setFilter] = useState("All");
   const positions = ["All", "FW", "MF", "DF", "GK"];
-  const filtered = filter === "All" ? PLAYERS : PLAYERS.filter(p => p.position === filter);
+  const filtered = filter === "All" ? FEATURED : FEATURED.filter(p => p.position === filter);
 
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 20px 48px", background: "#fff" }}>

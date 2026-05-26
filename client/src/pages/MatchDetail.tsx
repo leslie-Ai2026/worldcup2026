@@ -1,52 +1,93 @@
 import { useState } from "react";
 import { useRoute, useLocation, Link } from "wouter";
+import { OPENING_FIXTURES, PLAYER_ROSTERS } from "@/data/worldcup2026.js";
+
 const flagUrl = (code: string) => `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
 
-interface Player { slug: string; name: string; number: number; position: string; club: string; age: number; caps: number; goals: number; img: string; }
-interface TeamSquad { code: string; name: string; flagCode: string; coach: string; formation: string; players: Player[]; }
+// Generate match entries dynamically from fixtures + rosters
+const ALL_MATCHES = OPENING_FIXTURES.map(f => {
+  const homeKey = Object.keys(PLAYER_ROSTERS).find(k =>
+    k === f.home.toLowerCase().replace(/\s+/g, "_") ||
+    PLAYER_ROSTERS[k]?.[0]?.name === f.home
+  );
+  const awayKey = Object.keys(PLAYER_ROSTERS).find(k =>
+    k === f.away.toLowerCase().replace(/\s+/g, "_")
+  );
 
-const DB: Record<string, { home: TeamSquad; away: TeamSquad; date: string; time: string; venue: string; capacity: number; broadcast: { platform: string; region: string }[] }> = {
-  "mex-vs-rsa": {
-    home: { code: "MEX", name: "Mexico", flagCode: "mx", coach: "Javier Aguirre", formation: "4-3-3",
-      players: [
-        { slug: "guillermo-ochoa", name: "Guillermo Ochoa", number: 13, position: "GK", club: "Salernitana", age: 40, caps: 148, goals: 0, img: "https://images.unsplash.com/photo-1508341591423-4347099e1f19?w=120&q=80" },
-        { slug: "edson-alvarez", name: "Edson Álvarez", number: 4, position: "MF", club: "West Ham", age: 28, caps: 78, goals: 5, img: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=120&q=80" },
-        { slug: "santiago-gimenez", name: "Santiago Giménez", number: 9, position: "FW", club: "Feyenoord", age: 25, caps: 32, goals: 18, img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=120&q=80" },
-        { slug: "kylian-mbappe", name: "Kylian Mbappé", number: 10, position: "FW", club: "Real Madrid", age: 27, caps: 92, goals: 56, img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=120&q=80" },
-        { slug: "hirving-lozano", name: "Hirving Lozano", number: 22, position: "FW", club: "PSV", age: 30, caps: 70, goals: 17, img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=120&q=80" },
-        { slug: "cesar-montes", name: "César Montes", number: 3, position: "DF", club: "Almería", age: 28, caps: 46, goals: 1, img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&q=80" },
-        { slug: "luis-chavez", name: "Luis Chávez", number: 18, position: "MF", club: "Dynamo Moscow", age: 28, caps: 34, goals: 4, img: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=120&q=80" },
-      ]},
-    away: { code: "RSA", name: "South Africa", flagCode: "za", coach: "Hugo Broos", formation: "4-4-2",
-      players: [
-        { slug: "ronwen-williams", name: "Ronwen Williams", number: 1, position: "GK", club: "Mamelodi Sundowns", age: 32, caps: 42, goals: 0, img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&q=80" },
-        { slug: "percy-tau", name: "Percy Tau", number: 10, position: "FW", club: "Al Ahly", age: 31, caps: 45, goals: 16, img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80" },
-        { name: "Teboho Mokoena", number: 8, position: "MF", club: "Mamelodi Sundowns", age: 27, caps: 30, goals: 4, img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&q=80" },
-        { name: "Sipho Mbule", number: 14, position: "MF", club: "Mamelodi Sundowns", age: 26, caps: 20, goals: 2, img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&q=80" },
-        { name: "Grant Kekana", number: 5, position: "DF", club: "Mamelodi Sundowns", age: 32, caps: 18, goals: 0, img: "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=120&q=80" },
-        { name: "Evidence Makgopa", number: 9, position: "FW", club: "Orlando Pirates", age: 24, caps: 12, goals: 5, img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=120&q=80" },
-      ]},
-    date: "June 11, 2026", time: "20:00 UTC", venue: "Estadio Azteca, Mexico City", capacity: 87523,
-    broadcast: [{ platform: "FOX Sports", region: "United States" }, { platform: "BBC One", region: "United Kingdom" }, { platform: "TSN", region: "Canada" }, { platform: "Televisa", region: "Mexico" }],
-  },
-};
+  const homePlayers = (homeKey ? PLAYER_ROSTERS[homeKey] : []) || [];
+  const awayPlayers = (awayKey ? PLAYER_ROSTERS[awayKey] : []) || [];
 
-function PlayerPopup({ player, onClose }: { player: Player; onClose: () => void }) {
+  const countryCodeMap: Record<string, string> = {
+    Mexico: "mx", Canada: "ca", USA: "us", Paraguay: "py", Brazil: "br", Argentina: "ar",
+    Colombia: "co", "South Korea": "kr", France: "fr", Germany: "de", Japan: "jp",
+    Czechia: "cz", Spain: "es", Netherlands: "nl", Senegal: "sn", Bosnia: "ba",
+    England: "gb", Portugal: "pt", Morocco: "ma", Norway: "no", Italy: "it",
+    Uruguay: "uy", Egypt: "eg", Chile: "cl", Belgium: "be", Croatia: "hr",
+    "South Africa": "za", Iran: "ir", Nigeria: "ng", Australia: "au", Peru: "pe",
+    "Saudi Arabia": "sa", Switzerland: "ch", Denmark: "dk", Ecuador: "ec",
+    "New Zealand": "nz", Austria: "at", Serbia: "rs", Qatar: "qa", Jamaica: "jm",
+    Sweden: "se", Poland: "pl", Ukraine: "ua", Mali: "ml", Hungary: "hu",
+    Scotland: "gb", Algeria: "dz", Panama: "pa",
+  };
+
+  const broadcastMap: Record<string, string[]> = {
+    mx: ["FOX Sports (US)", "Televisa (MX)", "BBC One (UK)", "TSN (CA)"],
+    us: ["FOX Sports (US)", "BBC One (UK)", "TSN (CA)", "ESPN (LATAM)"],
+    ca: ["TSN (CA)", "FOX Sports (US)", "BBC One (UK)"],
+    br: ["Globo (BR)", "FOX Sports (US)", "BBC One (UK)", "ESPN (LATAM)"],
+    ar: ["TyC Sports (AR)", "FOX Sports (US)", "BBC One (UK)", "ESPN (LATAM)"],
+    fr: ["TF1 (FR)", "FOX Sports (US)", "BBC One (UK)", "beIN Sports (MENA)"],
+    de: ["ZDF (DE)", "FOX Sports (US)", "BBC One (UK)"],
+    gb: ["BBC One (UK)", "ITV (UK)", "FOX Sports (US)", "Optus Sport (AU)"],
+    es: ["RTVE (ES)", "FOX Sports (US)", "BBC One (UK)"],
+    it: ["RAI (IT)", "FOX Sports (US)", "BBC One (UK)"],
+    pt: ["RTP (PT)", "FOX Sports (US)", "BBC One (UK)"],
+    nl: ["NOS (NL)", "FOX Sports (US)", "BBC One (UK)"],
+    za: ["SuperSport (ZA)", "FOX Sports (US)", "BBC One (UK)"],
+  };
+  const homeCode = countryCodeMap[f.home] || f.home.slice(0, 2).toLowerCase();
+  const awayCode = countryCodeMap[f.away] || f.away.slice(0, 2).toLowerCase();
+
+  return {
+    id: f.id,
+    home: { code: f.home.substring(0, 3).toUpperCase(), name: f.home, flagCode: homeCode, coach: "TBD", formation: "TBD",
+      players: homePlayers.map((p: any) => ({
+        slug: p.name.toLowerCase().replace(/\s+/g, "-").normalize("NFD").replace(/[̀-ͯ]/g, ""),
+        name: p.name, number: p.number, position: p.position, club: p.club,
+        age: 0, caps: 0, goals: 0,
+        img: `https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=120&q=80`,
+      })),
+    },
+    away: { code: f.away.substring(0, 3).toUpperCase(), name: f.away, flagCode: awayCode, coach: "TBD", formation: "TBD",
+      players: awayPlayers.map((p: any) => ({
+        slug: p.name.toLowerCase().replace(/\s+/g, "-").normalize("NFD").replace(/[̀-ͯ]/g, ""),
+        name: p.name, number: p.number, position: p.position, club: p.club,
+        age: 0, caps: 0, goals: 0,
+        img: `https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=120&q=80`,
+      })),
+    },
+    date: f.date, time: f.time, venue: f.venue,
+    capacity: f.venue.includes("Azteca") ? 87523 : f.venue.includes("SoFi") ? 70240 : f.venue.includes("MetLife") ? 82500 : 60000,
+    broadcast: (broadcastMap[homeCode] || ["FOX Sports (US)", "BBC One (UK)", "TSN (CA)"]).map((p: string) => ({ platform: p.split(" (")[0], region: p.split("(")[1]?.replace(")", "") || "Global" })),
+  };
+});
+
+function PlayerPopup({ player, onClose }: { player: any; onClose: () => void }) {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
       <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)" }} />
       <div style={{ position: "relative", background: "#fff", border: "1px solid var(--border)", borderRadius: 2, padding: 24, maxWidth: 380, width: "90%" }} onClick={e => e.stopPropagation()}>
         <button onClick={onClose} style={{ position: "absolute", top: 10, right: 14, background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
         <div style={{ display: "flex", gap: 14, marginBottom: 18 }}>
-          <img src={player.img} alt={player.name} style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover" }} onError={e => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=120&q=80"; }} />
+          <img src={player.img} alt={player.name} style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover" }} />
           <div>
             <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 20, marginBottom: 2 }}>{player.name}</h3>
             <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>#{player.number} · {player.position}</div>
             <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{player.club}</div>
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, textAlign: "center" }}>
-          {[{ v: player.age, l: "Age" }, { v: player.caps, l: "Caps" }, { v: player.goals, l: "Goals" }].map(({ v, l }) => (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8, textAlign: "center" }}>
+          {[{ v: player.number, l: "Shirt #" }, { v: player.position, l: "Position" }].map(({ v, l }) => (
             <div key={l} style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 2, padding: "8px 4px" }}>
               <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 20 }}>{v}</div>
               <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase" }}>{l}</div>
@@ -61,25 +102,36 @@ function PlayerPopup({ player, onClose }: { player: Player; onClose: () => void 
 export default function MatchDetail() {
   const [, params] = useRoute("/match/:matchId");
   const [, setLocation] = useLocation();
-  const matchId = params?.matchId || "mex-vs-rsa";
-  const match = DB[matchId];
-  if (!match) return <div style={{ padding: 40, textAlign: "center" }}>Match not found. <span onClick={e => { e.preventDefault(); setLocation("/matches"); }} style={{ color: "var(--accent-blue)", cursor: "pointer", textDecoration: "underline" }}>Back to Schedule</span></div>;
+  const matchId = params?.matchId || "";
+
+  const match = ALL_MATCHES.find(m => m.id === matchId);
+
+  if (!match) {
+    return (
+      <div style={{ padding: 80, textAlign: "center", background: "#fff" }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 28, marginBottom: 8 }}>Match Not Found</h1>
+        <p style={{ fontSize: 14, color: "var(--text-secondary)", marginBottom: 20 }}>
+          No data for <strong>{matchId}</strong>. Available: {ALL_MATCHES.slice(0, 3).map(m => m.id).join(", ")}…
+        </p>
+        <span onClick={e => { e.preventDefault(); setLocation("/matches"); }} style={{ color: "var(--accent-blue)", cursor: "pointer", textDecoration: "underline", fontSize: 14 }}>Back to Schedule</span>
+      </div>
+    );
+  }
 
   const { home, away } = match;
-  const [selected, setSelected] = useState<Player | null>(null);
-  const [fanVote, setFanVote] = useState<string | null>(null);
+  const [selected, setSelected] = useState<any>(null);
 
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 20px 40px", background: "#fff" }}>
       <span onClick={e => { e.preventDefault(); setLocation("/matches"); }} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, color: "var(--accent-blue)", textDecoration: "none", marginBottom: 18, cursor: "pointer" }}>← Back to Schedule</span>
 
-      <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "clamp(28px,5vw,38px)", textAlign: "center", marginBottom: 4 }}>{home.name} vs {away.name}</h1>
-      <p style={{ textAlign: "center", fontSize: 13, color: "var(--text-secondary)", marginBottom: 8 }}>{match.date} · {match.time} · {match.venue} · Capacity: {match.capacity.toLocaleString()}</p>
+      <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "clamp(28px, 5vw, 38px)", textAlign: "center", marginBottom: 4 }}>{home.name} vs {away.name}</h1>
+      <p style={{ textAlign: "center", fontSize: 13, color: "var(--text-secondary)", marginBottom: 8 }}>{match.date} · {match.time} · {match.venue}</p>
 
       {/* Broadcast bar */}
-      <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 2, padding: "12px 16px", marginBottom: 24, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+      <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 2, padding: "12px 16px", marginBottom: 24, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <span style={{ fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 11, color: "var(--accent-red)", letterSpacing: "0.06em", textTransform: "uppercase" }}>📺 Where to Watch</span>
-        {match.broadcast.map(b => (
+        {match.broadcast.map((b: any) => (
           <span key={b.platform} style={{ fontSize: 12, fontWeight: 500 }}>
             <strong>{b.platform}</strong> <span style={{ color: "var(--text-muted)", fontSize: 10 }}>{b.region}</span>
           </span>
@@ -101,50 +153,28 @@ export default function MatchDetail() {
         </div>
       </div>
 
-      {/* Squads — two columns */}
+      {/* Squads */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 20, marginBottom: 28 }}>
         {[home, away].map(team => (
           <div key={team.code} style={{ border: "1px solid var(--border)" }}>
-            <div style={{ background: "#111827", color: "#fff", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ background: "#111827", color: "#fff", padding: "10px 14px", display: "flex", justifyContent: "space-between" }}>
               <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 16 }}>{team.code} ROSTER</span>
             </div>
-            <div style={{ padding: "8px 14px", borderBottom: "1px solid var(--border)", display: "flex", gap: 16, fontSize: 12, color: "var(--text-secondary)" }}>
-              <span>👔 <strong style={{ color: "var(--text-primary)" }}>{team.coach}</strong></span>
-              <span>📋 {team.formation}</span>
-            </div>
-            {team.players.map(p => (
-              <div key={p.name} style={{
-                display: "flex", alignItems: "center", gap: 10, padding: "8px 14px",
-                borderBottom: "1px solid var(--border)", cursor: "pointer",
-                transition: "background 0.08s",
-              }}
+            {team.players.map((p: any) => (
+              <div key={p.name} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 14px", borderBottom: "1px solid var(--border)", cursor: "pointer" }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#F9FAFB"; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-                onClick={() => setSelected(p)}
-              >
+                onClick={() => setSelected(p)}>
                 <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-muted)", width: 24, textAlign: "right" }}>{p.number}</span>
-                <img src={p.img} alt="" style={{ width: 34, height: 34, borderRadius: "50%", objectFit: "cover" }} onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                 <div style={{ flex: 1 }}>
-                  <Link href={`/players/${p.slug}`} style={{ fontSize: 13, fontWeight: 600, color: "var(--accent-blue)", textDecoration: "none", cursor: "pointer" }}
-                    onClick={e => e.stopPropagation()}>{p.name}</Link>
-                  <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 6 }}>{p.position}</span>
+                  <Link href={`/players/${p.slug}`} style={{ fontSize: 13, fontWeight: 600, color: "var(--accent-blue)", textDecoration: "none" }} onClick={e => e.stopPropagation()}>{p.name}</Link>
+                  <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 6 }}>{p.position} · {p.club}</span>
                 </div>
               </div>
             ))}
           </div>
         ))}
       </div>
-
-      {/* Bottom action buttons */}
-      <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-        <button className="btn-outline" onClick={() => setFanVote(fanVote ? null : "home")} style={{ borderColor: fanVote === "home" ? "#111827" : "var(--border)" }}>
-          🗳️ {fanVote ? "Vote Recorded: " + (fanVote === "home" ? home.name : fanVote === "away" ? away.name : "Draw") : "Fan Vote: Who Wins?"}
-        </button>
-        <button className="btn-black">
-          🤖 ASK AI: TACTICAL PRE-MATCH ANALYSIS
-        </button>
-      </div>
-
       {selected && <PlayerPopup player={selected} onClose={() => setSelected(null)} />}
     </div>
   );
