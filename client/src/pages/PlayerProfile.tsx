@@ -3,18 +3,33 @@ import playersData from "@/data/seo-source/players.json";
 
 const flagUrl = (code: string) => `https://flagcdn.com/w80/${code.toLowerCase()}.png`;
 
+const FLAG_MAP: Record<string, string> = {
+  Mexico: "mx", Brazil: "br", Switzerland: "ch", "United States": "us",
+  Argentina: "ar", France: "fr", Germany: "de", England: "gb",
+  Spain: "es", Portugal: "pt", Italy: "it", Netherlands: "nl",
+};
+
+function getFlagCode(country: string): string {
+  return FLAG_MAP[country] || country.slice(0, 2).toLowerCase();
+}
+
 interface Player {
-  id: string; name: string; country: string; flagCode: string; club: string;
-  position: string; number: number; age: number; caps: number; goals: number;
-  marketValue: string; aiPredictedGoals: number; matchImpactScore: string;
-  fullBio: string; seo_title: string; seo_description: string;
+  id: string; name: string; country: string; club: string;
+  position: string; jerseyNumber?: string; number?: number;
+  age: number; marketValue: string; highlights?: string;
+  aiPrediction?: string; aiPredictedGoals?: number;
+  seoKeywords?: string; fullBio?: string; seo_title?: string; seo_description?: string;
+  flagCode?: string; caps?: number; goals?: number; matchImpactScore?: string;
 }
 
 const PLAYER_MAP: Record<string, Player> = Object.fromEntries(
   (playersData as Player[]).map(p => [p.id, p])
 );
 
-const ALL_PLAYERS: Player[] = playersData as Player[];
+const ALL_PLAYERS: Player[] = (playersData as Player[]).map(p => ({
+  ...p,
+  number: p.number ?? (p.jerseyNumber ? parseInt(p.jerseyNumber) : undefined),
+}));
 
 export default function PlayerProfile() {
   const [, params] = useRoute("/players/:slug");
@@ -42,8 +57,8 @@ export default function PlayerProfile() {
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 20px 40px", background: "#fff" }}>
       {/* pSEO Meta */}
-      <title>{player.seo_title}</title>
-      <meta name="description" content={player.seo_description} />
+      <title>{player.seo_title || `${player.name} — 2026 World Cup Player Profile | WorldCupHacks`}</title>
+      <meta name="description" content={player.seo_description || player.seoKeywords || `${player.name} (${player.club}, ${player.country}) — ${player.position}, ${player.age} years old. ${player.highlights || ''}`} />
 
       {/* Breadcrumb */}
       <div style={{ display: "flex", gap: 6, marginBottom: 20, fontSize: 11, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
@@ -62,10 +77,10 @@ export default function PlayerProfile() {
         <div style={{ flex: 1, minWidth: 260 }}>
           <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 900, fontSize: "clamp(28px, 4vw, 40px)", marginBottom: 4 }}>{player.name}</h1>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
-            <img src={flagUrl(player.flagCode)} alt={player.country} style={{ width: 24, height: 16, objectFit: "contain" }} />
+            <img src={flagUrl(getFlagCode(player.country))} alt={player.country} style={{ width: 24, height: 16, objectFit: "contain" }} />
             <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>{player.country}</span>
             <span style={{ color: "var(--text-muted)" }}>·</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)" }}>#{player.number}</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)" }}>#{player.jerseyNumber || player.number}</span>
             <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>{player.position}</span>
             <span style={{ color: "var(--text-muted)" }}>·</span>
             <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>{player.club}</span>
@@ -74,16 +89,18 @@ export default function PlayerProfile() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(90px, 1fr))", gap: 10, marginBottom: 14 }}>
             {[
-              { v: player.age, l: "Age" }, { v: player.caps, l: "Caps" },
-              { v: player.goals, l: "Goals" }, { v: player.matchImpactScore, l: "Match Impact" },
-            ].map(({ v, l }) => (
-              <div key={l} style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 2, padding: "8px 10px", textAlign: "center" }}>
-                <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 20, color: "var(--text-primary)", lineHeight: 1 }}>{v}</div>
-                <div style={{ fontSize: 9, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{l}</div>
+              { v: player.age, l: "Age" },
+              player.caps != null ? { v: player.caps, l: "Caps" } : null,
+              player.goals != null ? { v: player.goals, l: "Goals" } : null,
+              player.matchImpactScore != null ? { v: player.matchImpactScore, l: "Impact" } : null,
+            ].filter(Boolean).map(s => s && (
+              <div key={s.l} style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: 2, padding: "8px 10px", textAlign: "center" }}>
+                <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 20, color: "var(--text-primary)", lineHeight: 1 }}>{s.v}</div>
+                <div style={{ fontSize: 9, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.l}</div>
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.65, fontStyle: "italic" }}>{player.fullBio}</p>
+          <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.65, fontStyle: "italic" }}>{player.highlights || player.fullBio}</p>
         </div>
       </div>
 
@@ -91,8 +108,9 @@ export default function PlayerProfile() {
       <div style={{ borderTop: "1px solid var(--border)", paddingTop: 20, display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
         <div style={{ background: "var(--gold-light)", border: "1px solid #fde68a", borderRadius: 4, padding: "14px 20px", textAlign: "center", flex: "1 1 300px" }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "var(--accent-gold)", marginBottom: 4 }}>🤖 AI PREDICTION</div>
-          <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 28 }}>{player.aiPredictedGoals} goals</div>
-          <div style={{ fontSize: 11, color: "var(--text-muted)" }}>projected in 2026 World Cup</div>
+          <div style={{ fontFamily: "var(--font-body)", fontWeight: 600, fontSize: 13, color: "var(--text-primary)", lineHeight: 1.5 }}>
+            {player.aiPrediction || (player.aiPredictedGoals != null ? `${player.aiPredictedGoals} goals projected in 2026 World Cup` : "Prediction pending — data loading")}
+          </div>
         </div>
         <Link href="/supporter-kit" style={{ textDecoration: "none", flex: "1 1 300px", display: "flex" }}>
           <button className="btn-black" style={{ width: "100%", justifyContent: "center", fontSize: 14, padding: "16px 0" }}>
